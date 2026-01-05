@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
-  <title>Audyt Podatkowy</title>
+  <title>Audyt Podatkowy - Filipiak Babicz Tax</title>
   
   <script src="https://cdn.tailwindcss.com"></script>
   
@@ -32,7 +32,7 @@
           },
           screens: {
             'lg': '1024px',
-            'tall': {'raw': '(min-height: 850px)'}, // Tylko dla wysokich ekranów
+            'tall': {'raw': '(min-height: 850px)'},
           },
           borderRadius: {
             DEFAULT: '0px',
@@ -46,10 +46,8 @@
     body {
       -webkit-font-smoothing: antialiased;
       -moz-osx-font-smoothing: grayscale;
-      /* Pozwalamy na scroll na mobile */
       overflow-x: hidden;
-      /* Usuwamy domyślny highlight przy tapnięciu na mobile (zrobimy własny w CSS) */
-      -webkit-tap-highlight-color: transparent;
+      -webkit-tap-highlight-color: transparent; /* Usuwa niebieskie mignięcie na Androidzie */
     }
     
     ::-webkit-scrollbar {
@@ -59,7 +57,7 @@
     
     @media (min-width: 1024px) {
       body {
-        overflow: hidden; /* Blokada scrolla na desktopie */
+        overflow: hidden;
       }
     }
   </style>
@@ -79,104 +77,102 @@
     const QUIZ_QUESTIONS = [
       {
         id: 1,
-        text: "Jaka jest forma prawna Twojej działalności?",
+        text: "Jaka jest forma prawna Twojego biznesu?",
         options: [
-          { id: 'q1_a', label: "Jednoosobowa działalność gospodarcza (JDG)", scoreValue: 10 },
-          { id: 'q1_b', label: "Spółka z ograniczoną odpowiedzialnością", scoreValue: 20 },
-          { id: 'q1_c', label: "Spółka komandytowa lub akcyjna", scoreValue: 30 },
-          { id: 'q1_d', label: "Planuję dopiero otworzyć firmę", scoreValue: 5 }
+          { id: 'q1_a', label: "JDG / Spółka Cywilna", scoreValue: 10 },
+          { id: 'q1_b', label: "Spółka z o.o. / Komandytowa", scoreValue: 20 },
+          { id: 'q1_c', label: "Spółka Akcyjna / Grupa Kapitałowa", scoreValue: 30 },
+          { id: 'q1_d', label: "Fundacja / Stowarzyszenie", scoreValue: 15 }
         ]
       },
       {
         id: 2,
-        text: "Jaka jest roczna skala przychodów Twojej firmy?",
+        text: "Jaka jest roczna skala przychodów?",
         options: [
-          { id: 'q2_a', label: "Do 200 000 PLN", scoreValue: 10 },
-          { id: 'q2_b', label: "200 000 PLN - 2 000 000 PLN", scoreValue: 20 },
-          { id: 'q2_c', label: "Powyżej 2 000 000 PLN", scoreValue: 30 }
+          { id: 'q2_a', label: "Do 2 mln EUR (Mały Podatnik)", scoreValue: 10 },
+          { id: 'q2_b', label: "2 mln EUR - 50 mln EUR", scoreValue: 20 },
+          { id: 'q2_c', label: "Powyżej 50 mln EUR (Duży Podatnik)", scoreValue: 30 }
         ]
       },
       {
         id: 3,
-        text: "Czy dokonujesz transakcji zagranicznych?",
+        text: "Czy występują transakcje z podmiotami powiązanymi?",
         options: [
-          { id: 'q3_a', label: "Nie, działam tylko w Polsce", scoreValue: 0 },
-          { id: 'q3_b', label: "Tak, w obrębie Unii Europejskiej", scoreValue: 15 },
-          { id: 'q3_c', label: "Tak, poza Unię Europejską (Export/Import)", scoreValue: 25 }
+          { id: 'q3_a', label: "Nie, brak powiązań", scoreValue: 0 },
+          { id: 'q3_b', label: "Tak, wyłącznie krajowe", scoreValue: 15 },
+          { id: 'q3_c', label: "Tak, transgraniczne (Ceny Transferowe)", scoreValue: 25 }
         ]
       },
       {
         id: 4,
-        text: "Ilu pracowników zatrudniasz?",
+        text: "Z jakich preferencji podatkowych korzystasz?",
         options: [
-          { id: 'q4_a', label: "Nikogo nie zatrudniam / B2B", scoreValue: 0 },
-          { id: 'q4_b', label: "1 - 10 pracowników", scoreValue: 10 },
-          { id: 'q4_c', label: "Powyżej 10 pracowników", scoreValue: 20 }
+          { id: 'q4_a', label: "Zasady ogólne / Podatek liniowy", scoreValue: 10 },
+          { id: 'q4_b', label: "CIT Estoński", scoreValue: 20 },
+          { id: 'q4_c', label: "Ulga B+R / IP Box / PSI", scoreValue: 30 }
         ]
       },
       {
         id: 5,
-        text: "Jakie jest Twoje główne wyzwanie podatkowe?",
+        text: "Jaki jest priorytet w zarządzaniu podatkami?",
         options: [
-          { id: 'q5_a', label: "Minimalizacja formalności (czas)", scoreValue: 10 },
-          { id: 'q5_b', label: "Bezpieczeństwo i audyt (ryzyko)", scoreValue: 20 },
-          { id: 'q5_c', label: "Optymalizacja podatkowa (koszty)", scoreValue: 30 }
+          { id: 'q5_a', label: "Bezpieczeństwo i Compliance (KKS)", scoreValue: 20 },
+          { id: 'q5_b', label: "Efektywność podatkowa (Cashflow)", scoreValue: 30 },
+          { id: 'q5_c', label: "Outsourcing procesów (Oszczędność czasu)", scoreValue: 10 }
         ]
       }
     ];
 
     const RECOMMENDATIONS = [
       {
-        id: 'basic',
-        title: "Księgowość Uproszczona",
-        description: "Twoja działalność nie wymaga skomplikowanych struktur. Rekomendujemy nasze usługi podstawowej księgowości, które pozwolą Ci skupić się na rozwoju biznesu przy minimalnych formalnościach.",
+        id: 'compliance',
+        title: "Tax Compliance & Księgowość",
+        description: "Twoja struktura wymaga solidnego fundamentu. Rekomendujemy przejęcie odpowiedzialności za rozliczenia podatkowe, co zapewni bezpieczeństwo zarządu i terminowość deklaracji.",
         features: [
-          "Prowadzenie KPiR lub Ryczałtu",
-          "Obsługa deklaracji VAT i ZUS",
-          "Dostęp do platformy online 24/7",
-          "Reprezentacja przed Urzędem Skarbowym"
+          "Pełna obsługa księgowa (CIT/VAT)",
+          "Weryfikacja Jednolitego Pliku Kontrolnego",
+          "Reprezentacja podczas kontroli KAS",
+          "Monitoring zmian w prawie"
         ],
-        ctaText: "Zamów Księgowość Uproszczoną",
+        ctaText: "Zapytaj o Ofertę Compliance",
         minScore: 0,
-        maxScore: 45
+        maxScore: 65
       },
       {
-        id: 'advanced',
-        title: "Pełna Księgowość i Kadry",
-        description: "Twój biznes się rozwija i wymaga dokładniejszej ewidencji. Proponujemy pełną księgowość wraz z obsługą kadrowo-płacową, co zapewni bezpieczeństwo przy rosnącej skali operacji.",
+        id: 'advisory',
+        title: "Doradztwo Podatkowe i Strategia",
+        description: "Skala Twojego biznesu otwiera możliwości optymalizacji. Proponujemy wdrożenie CIT Estońskiego lub ulg technologicznych (B+R/IP Box) pod nadzorem Doradcy Podatkowego.",
         features: [
-          "Prowadzenie Ksiąg Rachunkowych",
-          "Pełna obsługa kadrowo-płacowa",
-          "Raportowanie zarządcze",
-          "Weryfikacja umów B2B"
+          "Wdrożenie CIT Estońskiego",
+          "Ulgi proinnowacyjne (B+R, IP Box)",
+          "Optymalizacja formy opodatkowania",
+          "Zabezpieczenie majątku prywatnego"
         ],
-        ctaText: "Zapytaj o Ofertę dla Spółek",
-        minScore: 46,
-        maxScore: 90
+        ctaText: "Umów Konsultację Strategiczną",
+        minScore: 66,
+        maxScore: 100
       },
       {
         id: 'expert',
-        title: "Doradztwo Podatkowe i Audyt",
-        description: "Złożoność Twoich interesów wymaga dedykowanego opiekuna i strategii podatkowej. Rekomendujemy stałą współpracę z naszymi Doradcami Podatkowymi oraz audyt procesów.",
+        title: "Audyt i Ceny Transferowe",
+        description: "Złożoność Twoich operacji wymaga zaawansowanego nadzoru. Rekomendujemy audyt procedur podatkowych oraz weryfikację dokumentacji cen transferowych (TP) w celuitygacji ryzyk.",
         features: [
-          "Indywidualne interpretacje podatkowe",
-          "Optymalizacja struktur międzynarodowych",
           "Audyt bezpieczeństwa podatkowego",
-          "Obsługa cen transferowych"
+          "Dokumentacja Cen Transferowych",
+          "Procedury należytej staranności (WHT)",
+          "Interpretacje indywidualne i WIS"
         ],
-        ctaText: "Umów Konsultację Ekspercką",
-        minScore: 91,
+        ctaText: "Skonsultuj z Ekspertem",
+        minScore: 101,
         maxScore: 999
       }
     ];
 
     const Button = ({ children, variant = 'primary', fullWidth = false, className = '', ...props }) => {
-      // Używamy active:scale-95 dla efektu kliknięcia na mobile
-      // Używamy hover: na desktopie (lg:)
-      const baseStyles = "px-6 py-4 lg:py-3 tall:px-8 tall:py-4 text-sm uppercase tracking-widest font-bold transition-all duration-150 disabled:opacity-50 disabled:cursor-not-allowed border-2 active:scale-95 lg:active:scale-100";
+      const baseStyles = "px-6 py-4 lg:py-3 tall:px-8 tall:py-4 text-sm uppercase tracking-widest font-bold transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed border-2 active:scale-95 lg:active:scale-100";
       
       const variants = {
-        primary: "bg-audit-orange border-audit-orange text-white lg:hover:bg-white lg:hover:text-audit-orange",
+        primary: "bg-audit-orange border-audit-orange text-white lg:hover:bg-white lg:hover:text-audit-orange shadow-lg hover:shadow-xl",
         outline: "bg-transparent border-audit-black text-audit-black lg:hover:bg-audit-black lg:hover:text-white",
         black: "bg-audit-black border-audit-black text-white lg:hover:bg-audit-orange lg:hover:border-audit-orange"
       };
@@ -231,7 +227,7 @@
       
       return (
         <div className="mt-4 tall:mt-8 pt-4 tall:pt-6 border-t-2 border-audit-black">
-          <h4 className="font-black text-audit-black uppercase tracking-widest mb-2 tall:mb-4 text-xs md:text-sm">Skala Złożoności Podatkowej</h4>
+          <h4 className="font-black text-audit-black uppercase tracking-widest mb-2 tall:mb-4 text-xs md:text-sm">Poziom Ryzyka Podatkowego</h4>
           
           <div className="relative h-6 tall:h-10 border-2 border-audit-black bg-white w-full mb-2">
             <div className="absolute inset-0 flex pointer-events-none">
@@ -248,16 +244,16 @@
 
           <div className="flex justify-between text-[10px] md:text-sm font-bold uppercase tracking-wider text-audit-black leading-tight">
             <div className="w-1/3 pr-1 md:pr-2">
-              <span className="block text-audit-orange mb-1">0-45</span>
-              <span>Niskie</span>
+              <span className="block text-audit-orange mb-1">Standard</span>
+              <span>Niski</span>
             </div>
             <div className="w-1/3 px-1 md:px-2 text-center">
-              <span className="block text-audit-orange mb-1">46-90</span>
-              <span>Średnie</span>
+              <span className="block text-audit-orange mb-1">Advanced</span>
+              <span>Średni</span>
             </div>
             <div className="w-1/3 pl-1 md:pl-2 text-right">
-              <span className="block text-audit-orange mb-1">91+</span>
-              <span>Wysokie</span>
+              <span className="block text-audit-orange mb-1">Complex</span>
+              <span>Wysoki</span>
             </div>
           </div>
         </div>
@@ -269,7 +265,7 @@
         <div className="inline-block cursor-pointer" onClick={onReset}>
            <img 
              src="https://www.filipiakbabicz.com/wp-content/uploads/2024/03/logo.png" 
-             alt="Filipiak Babicz Expert House" 
+             alt="Filipiak Babicz Tax" 
              className="h-8 lg:h-10 tall:h-24 w-auto object-contain"
            />
         </div>
@@ -308,19 +304,22 @@
         setStep(QuizStep.WELCOME);
       };
 
-      const handleAnswer = (questionId, answerId) => {
+      const handleAnswer = (e, questionId, answerId) => {
+        // NAPRAWA: Zdejmujemy focus z klikniętego elementu, aby nie był "podświetlony" na następnej stronie
+        e.currentTarget.blur();
+        
         setAnswers(prev => ({ ...prev, [questionId]: answerId }));
 
         if (currentQuestionIndex < QUIZ_QUESTIONS.length - 1) {
           setTimeout(() => {
             window.scrollTo({ top: 0, behavior: 'smooth' });
             setCurrentQuestionIndex(prev => prev + 1);
-          }, 200);
+          }, 250);
         } else {
           setTimeout(() => {
             window.scrollTo(0,0);
             setStep(QuizStep.RESULTS);
-          }, 200);
+          }, 250);
         }
       };
 
@@ -343,9 +342,8 @@
       );
 
       const renderWelcome = () => (
-        <div className="flex-1 flex flex-col justify-center items-center py-8 lg:py-0 tall:py-8 animate-fade-in lg:overflow-hidden pb-12 tall:pb-20">
+        <div className="flex-1 flex flex-col justify-center items-center py-8 lg:py-2 tall:py-8 lg:overflow-hidden pb-12 tall:pb-20">
           <Wrapper className="items-center justify-center">
-            {/* Zmieniony margines na lg (mniejszy) aby podnieść treść */}
             <div className="w-16 lg:w-20 tall:w-24 h-2 bg-audit-orange mb-8 lg:mb-6 tall:mb-10 flex-none"></div>
             
             <h1 className="text-4xl sm:text-6xl lg:text-7xl tall:text-9xl font-black text-audit-black mb-6 lg:mb-4 tall:mb-6 tracking-tighter uppercase text-center leading-[0.9] flex-none">
@@ -354,31 +352,36 @@
             </h1>
             
             <p className="text-base lg:text-xl tall:text-2xl text-audit-black font-bold mb-10 lg:mb-8 tall:mb-16 max-w-2xl text-center leading-normal flex-none">
-              Sprawdź 5 kluczowych obszarów Twojej firmy. Zidentyfikuj ryzyka. Odbierz plan naprawczy.
+              Sprawdź bezpieczeństwo Twojej firmy w 5 krokach. Zidentyfikuj ryzyka podatkowe. Odbierz strategię.
             </p>
 
-            {/* Zmniejszony margines dolny na lg */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-0 w-full mb-10 lg:mb-8 tall:mb-16 border-2 border-audit-black flex-none">
               <div className="p-6 lg:p-6 tall:p-8 transition-colors group border-b-2 lg:border-b-0 lg:border-r-2 border-audit-black 
-                              active:bg-audit-black active:text-white 
-                              lg:hover:bg-audit-black lg:hover:text-white">
-                <SharpSquare className="w-8 h-8 lg:w-8 lg:h-8 tall:w-10 tall:h-10 text-audit-orange mb-3 lg:mb-4 tall:mb-6 group-hover:text-white" />
-                <h3 className="font-black text-lg lg:text-lg tall:text-xl mb-2 lg:mb-2 tall:mb-3 uppercase tracking-wide text-audit-black group-hover:text-white">1. Analiza</h3>
-                <p className="text-sm lg:text-sm tall:text-base font-medium text-audit-black group-hover:text-white leading-relaxed">Weryfikacja formy prawnej i przychodów.</p>
+                              active:bg-audit-black lg:hover:bg-audit-black">
+                <SharpSquare className="w-8 h-8 lg:w-8 lg:h-8 tall:w-10 tall:h-10 text-audit-orange mb-3 lg:mb-4 tall:mb-6 
+                                        group-active:text-white lg:group-hover:text-white" />
+                <h3 className="font-black text-lg lg:text-lg tall:text-xl mb-2 lg:mb-2 tall:mb-3 uppercase tracking-wide text-audit-black 
+                               group-active:text-white lg:group-hover:text-white">1. Analiza</h3>
+                <p className="text-sm lg:text-sm tall:text-base font-medium text-audit-black leading-relaxed
+                              group-active:text-white lg:group-hover:text-white">Weryfikacja formy prawnej i przychodów.</p>
               </div>
               <div className="p-6 lg:p-6 tall:p-8 transition-colors group border-b-2 lg:border-b-0 lg:border-r-2 border-audit-black
-                              active:bg-audit-black active:text-white 
-                              lg:hover:bg-audit-black lg:hover:text-white">
-                <SharpTriangle className="w-8 h-8 lg:w-8 lg:h-8 tall:w-10 tall:h-10 text-audit-orange mb-3 lg:mb-4 tall:mb-6 group-hover:text-white" />
-                <h3 className="font-black text-lg lg:text-lg tall:text-xl mb-2 lg:mb-2 tall:mb-3 uppercase tracking-wide text-audit-black group-hover:text-white">2. Diagnoza</h3>
-                <p className="text-sm lg:text-sm tall:text-base font-medium text-audit-black group-hover:text-white leading-relaxed">Wykrycie nieefektywności podatkowych.</p>
+                              active:bg-audit-black lg:hover:bg-audit-black">
+                <SharpTriangle className="w-8 h-8 lg:w-8 lg:h-8 tall:w-10 tall:h-10 text-audit-orange mb-3 lg:mb-4 tall:mb-6 
+                                          group-active:text-white lg:group-hover:text-white" />
+                <h3 className="font-black text-lg lg:text-lg tall:text-xl mb-2 lg:mb-2 tall:mb-3 uppercase tracking-wide text-audit-black 
+                               group-active:text-white lg:group-hover:text-white">2. Diagnoza</h3>
+                <p className="text-sm lg:text-sm tall:text-base font-medium text-audit-black leading-relaxed
+                              group-active:text-white lg:group-hover:text-white">Wykrycie nieefektywności podatkowych.</p>
               </div>
               <div className="p-6 lg:p-6 tall:p-8 transition-colors group
-                              active:bg-audit-black active:text-white 
-                              lg:hover:bg-audit-black lg:hover:text-white">
-                <SharpCircle className="w-8 h-8 lg:w-8 lg:h-8 tall:w-10 tall:h-10 text-audit-orange mb-3 lg:mb-4 tall:mb-6 group-hover:text-white" />
-                <h3 className="font-black text-lg lg:text-lg tall:text-xl mb-2 lg:mb-2 tall:mb-3 uppercase tracking-wide text-audit-black group-hover:text-white">3. Rozwiązanie</h3>
-                <p className="text-sm lg:text-sm tall:text-base font-medium text-audit-black group-hover:text-white leading-relaxed">Konkretna rekomendacja działań.</p>
+                              active:bg-audit-black lg:hover:bg-audit-black">
+                <SharpCircle className="w-8 h-8 lg:w-8 lg:h-8 tall:w-10 tall:h-10 text-audit-orange mb-3 lg:mb-4 tall:mb-6 
+                                        group-active:text-white lg:group-hover:text-white" />
+                <h3 className="font-black text-lg lg:text-lg tall:text-xl mb-2 lg:mb-2 tall:mb-3 uppercase tracking-wide text-audit-black 
+                               group-active:text-white lg:group-hover:text-white">3. Rozwiązanie</h3>
+                <p className="text-sm lg:text-sm tall:text-base font-medium text-audit-black leading-relaxed
+                              group-active:text-white lg:group-hover:text-white">Konkretna rekomendacja działań.</p>
               </div>
             </div>
 
@@ -396,7 +399,8 @@
 
         return (
           <div className="flex-1 flex flex-col justify-center py-8 lg:py-4 tall:py-8 lg:overflow-hidden pb-12 tall:pb-20">
-            <Wrapper className="max-w-4xl justify-center">
+            {/* NAPRAWA: Dodanie key={currentQuestionIndex} wymusza odświeżenie komponentu i usunięcie stanów hover/active */}
+            <Wrapper className="max-w-4xl justify-center" key={currentQuestionIndex}>
               <div className="flex items-end gap-3 mb-8 lg:mb-6 tall:mb-16 border-b-4 border-audit-black pb-4 lg:pb-2 tall:pb-4 flex-none">
                 <span className="text-6xl lg:text-6xl tall:text-8xl font-black text-audit-orange leading-none">0{current}</span>
                 <span className="text-xl lg:text-xl tall:text-2xl font-bold text-audit-black mb-2 tall:mb-3">/ 0{total}</span>
@@ -406,15 +410,15 @@
                 {question.text}
               </h2>
 
-              <div className="grid gap-4 lg:gap-3 tall:gap-6 flex-none" key={question.id}>
+              <div className="grid gap-4 lg:gap-3 tall:gap-6 flex-none">
                 {question.options.map((opt) => (
                   <button
                     key={opt.id}
-                    onClick={() => handleAnswer(question.id, opt.id)}
-                    className={`group relative border-2 p-5 lg:p-4 tall:p-8 text-left transition-all active:scale-[0.98] lg:active:scale-100
+                    onClick={(e) => handleAnswer(e, question.id, opt.id)}
+                    className={`group relative border-2 p-5 lg:p-4 tall:p-8 text-left transition-all duration-150 active:scale-[0.98] lg:active:scale-95
                       ${answers[question.id] === opt.id 
-                        ? 'bg-audit-black border-audit-black text-white' 
-                        : 'bg-white border-audit-black text-audit-black active:bg-audit-orange active:border-audit-orange active:text-white lg:hover:bg-audit-orange lg:hover:border-audit-orange lg:hover:text-white'
+                        ? 'bg-audit-orange border-audit-orange text-white scale-[1.02] shadow-lg' 
+                        : 'bg-white border-audit-black text-audit-black hover:border-audit-orange hover:text-audit-orange active:bg-audit-orange active:border-audit-orange active:text-white'
                       }`}
                   >
                     <div className="flex items-center justify-between">
@@ -424,7 +428,7 @@
                       <SharpSquare className={`w-6 h-6 lg:w-5 lg:h-5 tall:w-6 tall:h-6 flex-shrink-0 transition-colors 
                         ${answers[question.id] === opt.id 
                           ? 'text-white' 
-                          : 'text-audit-black group-active:text-white lg:group-hover:text-white'}`} 
+                          : 'text-audit-black group-hover:text-audit-orange group-active:text-white'}`} 
                       />
                     </div>
                   </button>
@@ -460,14 +464,14 @@
                   <div className="bg-audit-black text-white p-8 lg:p-6 tall:p-10 border-2 border-audit-black">
                     <div className="flex items-center gap-4 mb-6 lg:mb-4 tall:mb-8">
                       <SharpAlert className="w-10 h-10 lg:w-8 lg:h-8 tall:w-12 tall:h-12 text-white" />
-                      <h3 className="text-xl lg:text-xl tall:text-2xl font-black uppercase tracking-wide">Zidentyfikowane Obszary</h3>
+                      <h3 className="text-xl lg:text-xl tall:text-2xl font-black uppercase tracking-wide">Zidentyfikowane Ryzyka</h3>
                     </div>
                     
                     <ul className="space-y-6 lg:space-y-4 tall:space-y-6">
                       {resultRecommendation.features.map((feature, idx) => (
                         <li key={idx} className="flex gap-4 items-start border-l-2 border-audit-orange pl-6">
                           <div>
-                            <h4 className="font-bold text-audit-orange text-xs uppercase mb-1 tall:mb-2 tracking-widest">Akcja {idx + 1}</h4>
+                            <h4 className="font-bold text-audit-orange text-xs uppercase mb-1 tall:mb-2 tracking-widest">Krok {idx + 1}</h4>
                             <p className="text-white text-sm lg:text-sm tall:text-lg font-medium leading-snug">{feature}</p>
                           </div>
                         </li>
@@ -494,7 +498,7 @@
                       {resultRecommendation.description}
                     </p>
                     <p className="text-base lg:text-sm tall:text-lg text-audit-black font-medium leading-relaxed">
-                      Wdrożenie tego modelu pozwoli wyeliminować zidentyfikowane ryzyka i uporządkować strukturę kosztową Twojego przedsiębiorstwa.
+                      Wdrożenie tego modelu pozwoli zminimalizować ryzyka podatkowe i usprawnić procesy wewnątrz Twojej organizacji.
                     </p>
                   </div>
 
@@ -502,7 +506,7 @@
                     <h3 className="font-black text-xl tall:text-2xl mb-6 lg:mb-4 tall:mb-8 text-audit-black uppercase">Skorzystaj z oferty</h3>
                     <div className="space-y-4 lg:space-y-3 tall:space-y-4">
                       <Button 
-                        onClick={() => alert("Tutaj normalnie byłoby przekierowanie do formularza kontaktowego.")} 
+                        onClick={() => alert("Tu będzie formularz kontaktowy")} 
                         variant="primary" 
                         fullWidth
                         className="text-base tall:text-lg w-full py-5 lg:py-4 tall:py-6"
