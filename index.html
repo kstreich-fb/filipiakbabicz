@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Audyt Podatkowy</title>
+  
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Jost:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+  
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Jost', 'Futura', 'sans-serif'],
+          },
+          colors: {
+            audit: {
+              black: '#1d1d1b',
+              white: '#ffffff',
+              orange: '#e44100',
+            }
+          },
+          borderRadius: {
+            none: '0px',
+            DEFAULT: '0px',
+            sm: '0px',
+            md: '0px',
+            lg: '0px',
+            xl: '0px',
+            '2xl': '0px',
+            '3xl': '0px',
+            full: '0px',
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body {
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+  </style>
+</head>
+<body class="bg-audit-white text-audit-black">
+  <div id="root"></div>
+
+  <script type="text/babel">
+    const { useState, useMemo, useEffect } = React;
+
+    const QuizStep = {
+      WELCOME: 0,
+      QUESTIONS: 1,
+      RESULTS: 2
+    };
+
+    const QUIZ_QUESTIONS = [
+      {
+        id: 1,
+        text: "Jaka jest forma prawna Twojej działalności?",
+        subtext: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
+        options: [
+          { id: 'q1_a', label: "Jednoosobowa działalność gospodarcza (JDG)", scoreValue: 10 },
+          { id: 'q1_b', label: "Spółka z ograniczoną odpowiedzialnością", scoreValue: 20 },
+          { id: 'q1_c', label: "Spółka komandytowa lub akcyjna", scoreValue: 30 },
+          { id: 'q1_d', label: "Planuję dopiero otworzyć firmę", scoreValue: 5 }
+        ]
+      },
+      {
+        id: 2,
+        text: "Jaka jest roczna skala przychodów Twojej firmy?",
+        subtext: "Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+        options: [
+          { id: 'q2_a', label: "Do 200 000 PLN", scoreValue: 10 },
+          { id: 'q2_b', label: "200 000 PLN - 2 000 000 PLN", scoreValue: 20 },
+          { id: 'q2_c', label: "Powyżej 2 000 000 PLN", scoreValue: 30 }
+        ]
+      },
+      {
+        id: 3,
+        text: "Czy dokonujesz transakcji zagranicznych?",
+        subtext: "Ut enim ad minim veniam, quis nostrud exercitation ullamco.",
+        options: [
+          { id: 'q3_a', label: "Nie, działam tylko w Polsce", scoreValue: 0 },
+          { id: 'q3_b', label: "Tak, w obrębie Unii Europejskiej", scoreValue: 15 },
+          { id: 'q3_c', label: "Tak, poza Unię Europejską (Export/Import)", scoreValue: 25 }
+        ]
+      },
+      {
+        id: 4,
+        text: "Ilu pracowników zatrudniasz?",
+        subtext: "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum.",
+        options: [
+          { id: 'q4_a', label: "Nikogo nie zatrudniam / B2B", scoreValue: 0 },
+          { id: 'q4_b', label: "1 - 10 pracowników", scoreValue: 10 },
+          { id: 'q4_c', label: "Powyżej 10 pracowników", scoreValue: 20 }
+        ]
+      },
+      {
+        id: 5,
+        text: "Jakie jest Twoje główne wyzwanie podatkowe?",
+        subtext: "Excepteur sint occaecat cupidatat non proident.",
+        options: [
+          { id: 'q5_a', label: "Minimalizacja formalności (czas)", scoreValue: 10 },
+          { id: 'q5_b', label: "Bezpieczeństwo i audyt (ryzyko)", scoreValue: 20 },
+          { id: 'q5_c', label: "Optymalizacja podatkowa (koszty)", scoreValue: 30 }
+        ]
+      }
+    ];
+
+    const RECOMMENDATIONS = [
+      {
+        id: 'basic',
+        title: "Księgowość Uproszczona",
+        description: "Twoja działalność nie wymaga skomplikowanych struktur. Rekomendujemy nasze usługi podstawowej księgowości, które pozwolą Ci skupić się na rozwoju biznesu przy minimalnych formalnościach.",
+        features: [
+          "Prowadzenie KPiR lub Ryczałtu",
+          "Obsługa deklaracji VAT i ZUS",
+          "Dostęp do platformy online 24/7",
+          "Reprezentacja przed Urzędem Skarbowym"
+        ],
+        ctaText: "Zamów Księgowość Uproszczoną",
+        minScore: 0,
+        maxScore: 45
+      },
+      {
+        id: 'advanced',
+        title: "Pełna Księgowość i Kadry",
+        description: "Twój biznes się rozwija i wymaga dokładniejszej ewidencji. Proponujemy pełną księgowość wraz z obsługą kadrowo-płacową, co zapewni bezpieczeństwo przy rosnącej skali operacji.",
+        features: [
+          "Prowadzenie Ksiąg Rachunkowych",
+          "Pełna obsługa kadrowo-płacowa",
+          "Raportowanie zarządcze",
+          "Weryfikacja umów B2B"
+        ],
+        ctaText: "Zapytaj o Ofertę dla Spółek",
+        minScore: 46,
+        maxScore: 90
+      },
+      {
+        id: 'expert',
+        title: "Doradztwo Podatkowe i Audyt",
+        description: "Złożoność Twoich interesów wymaga dedykowanego opiekuna i strategii podatkowej. Rekomendujemy stałą współpracę z naszymi Doradcami Podatkowymi oraz audyt procesów.",
+        features: [
+          "Indywidualne interpretacje podatkowe",
+          "Optymalizacja struktur międzynarodowych",
+          "Audyt bezpieczeństwa podatkowego",
+          "Obsługa cen transferowych"
+        ],
+        ctaText: "Umów Konsultację Ekspercką",
+        minScore: 91,
+        maxScore: 999
+      }
+    ];
+
+    const Button = ({ children, variant = 'primary', fullWidth = false, className = '', ...props }) => {
+      const baseStyles = "px-8 py-4 text-sm uppercase tracking-widest font-bold transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed border-2";
+      
+      const variants = {
+        primary: "bg-audit-orange border-audit-orange text-white hover:bg-white hover:text-audit-orange",
+        outline: "bg-transparent border-audit-black text-audit-black hover:bg-audit-black hover:text-white",
+        black: "bg-audit-black border-audit-black text-white hover:bg-audit-orange hover:border-audit-orange"
+      };
+
+      const widthClass = fullWidth ? "w-full" : "";
+
+      return (
+        <button 
+          className={`${baseStyles} ${variants[variant]} ${widthClass} ${className}`}
+          {...props}
+        >
+          {children}
+        </button>
+      );
+    };
+
+    const SharpSquare = (props) => (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="square" strokeLinejoin="miter" {...props}>
+        <rect x="3" y="3" width="18" height="18" />
+      </svg>
+    );
+
+    const SharpTriangle = (props) => (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="square" strokeLinejoin="miter" {...props}>
+        <path d="M12 3L22 21H2L12 3Z" />
+      </svg>
+    );
+
+    const SharpAlert = (props) => (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="square" strokeLinejoin="miter" {...props}>
+        <path d="M12 3L22 21H2L12 3Z" />
+        <path d="M12 9v4" />
+        <rect x="11" y="17" width="2" height="2" fill="currentColor" stroke="none" />
+      </svg>
+    );
+
+    const SharpCircle = (props) => (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="square" strokeLinejoin="miter" {...props}>
+        <circle cx="12" cy="12" r="10" />
+      </svg>
+    );
+    
+    const SharpArrowLeft = (props) => (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="square" strokeLinejoin="miter" {...props}>
+        <path d="M19 12H5" />
+        <path d="M12 19L5 12L12 5" />
+      </svg>
+    );
+
+    const ScoreLegend = ({ score }) => {
+      const maxScore = 135;
+      const percentage = Math.min(100, Math.max(0, (score / maxScore) * 100));
+      
+      return (
+        <div className="mt-8 md:mt-12 pt-6 md:pt-8 border-t-2 border-audit-black">
+          <h4 className="font-black text-audit-black uppercase tracking-widest mb-4 md:mb-6 text-xs md:text-sm">Skala Złożoności Podatkowej</h4>
+          
+          <div className="relative h-8 md:h-12 border-2 border-audit-black bg-white w-full mb-4">
+            <div className="absolute inset-0 flex pointer-events-none">
+               <div className="w-1/3 h-full border-r-2 border-audit-black"></div>
+               <div className="w-1/3 h-full border-r-2 border-audit-black"></div>
+               <div className="w-1/3 h-full"></div>
+            </div>
+
+            <div 
+              className="absolute top-0 left-0 bottom-0 bg-audit-orange transition-all duration-1000 ease-out mix-blend-multiply"
+              style={{ width: `${percentage}%` }}
+            ></div>
+          </div>
+
+          <div className="flex justify-between text-[10px] md:text-sm font-bold uppercase tracking-wider text-audit-black leading-tight">
+            <div className="w-1/3 pr-1 md:pr-2">
+              <span className="block text-audit-orange mb-1">0-45</span>
+              <span>Niskie</span>
+            </div>
+            <div className="w-1/3 px-1 md:px-2 text-center">
+              <span className="block text-audit-orange mb-1">46-90</span>
+              <span>Średnie</span>
+            </div>
+            <div className="w-1/3 pl-1 md:pl-2 text-right">
+              <span className="block text-audit-orange mb-1">91+</span>
+              <span>Wysokie</span>
+            </div>
+          </div>
+        </div>
+      );
+    };
+
+    const Logo = ({ onReset }) => (
+      <div className="w-full pt-8 md:pt-12 px-6 md:px-12 max-w-6xl mx-auto relative z-50">
+        <div className="inline-block cursor-pointer" onClick={onReset}>
+           <img 
+             src="https://www.filipiakbabicz.com/wp-content/uploads/2024/03/logo.png" 
+             alt="Filipiak Babicz Expert House" 
+             className="h-10 md:h-16 w-auto object-contain"
+           />
+        </div>
+      </div>
+    );
+
+    const App = () => {
+      const [step, setStep] = useState(QuizStep.WELCOME);
+      const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+      const [answers, setAnswers] = useState({});
+      
+      const score = useMemo(() => {
+        return Object.entries(answers).reduce((total, [qId, aId]) => {
+          const question = QUIZ_QUESTIONS.find(q => q.id === Number(qId));
+          const option = question?.options.find(opt => opt.id === aId);
+          return total + (option?.scoreValue || 0);
+        }, 0);
+      }, [answers]);
+
+      const handleStart = () => {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        setStep(QuizStep.QUESTIONS);
+        setCurrentQuestionIndex(0);
+        setAnswers({});
+      };
+
+      const handleReset = () => {
+        setStep(QuizStep.WELCOME);
+      };
+
+      const handleAnswer = (questionId, answerId) => {
+        setAnswers(prev => ({ ...prev, [questionId]: answerId }));
+
+        if (currentQuestionIndex < QUIZ_QUESTIONS.length - 1) {
+          setTimeout(() => {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            setCurrentQuestionIndex(prev => prev + 1);
+          }, 200);
+        } else {
+          setTimeout(() => {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            setStep(QuizStep.RESULTS);
+          }, 200);
+        }
+      };
+
+      const handleBack = () => {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        if (currentQuestionIndex > 0) {
+          setCurrentQuestionIndex(prev => prev - 1);
+        } else {
+          setStep(QuizStep.WELCOME);
+        }
+      };
+
+      const resultRecommendation = useMemo(() => {
+        return RECOMMENDATIONS.find(rec => score >= rec.minScore && score <= rec.maxScore) || RECOMMENDATIONS[0];
+      }, [score]);
+
+      const Wrapper = ({ children, className = "" }) => (
+        <div className={`max-w-6xl mx-auto px-6 md:px-12 w-full ${className}`}>
+          {children}
+        </div>
+      );
+
+      const renderWelcome = () => (
+        <div className="flex-grow flex flex-col justify-center items-center py-8 md:py-16 animate-fade-in">
+          <Wrapper className="flex flex-col items-center">
+            <div className="w-16 md:w-24 h-2 bg-audit-orange mb-8 md:mb-12"></div>
+            
+            <h1 className="text-5xl sm:text-7xl md:text-9xl font-black text-audit-black mb-6 md:mb-8 tracking-tighter uppercase text-center leading-[0.85]">
+              Audyt<br />
+              <span className="text-audit-orange">Podatkowy</span>
+            </h1>
+            
+            <p className="text-lg md:text-2xl text-audit-black font-bold mb-12 md:mb-20 max-w-2xl text-center leading-normal">
+              Sprawdź 5 kluczowych obszarów Twojej firmy. Zidentyfikuj ryzyka. Odbierz plan naprawczy.
+            </p>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-0 w-full mb-12 md:mb-20 border-2 border-audit-black">
+              <div className="p-6 md:p-10 hover:bg-audit-black hover:text-white transition-colors group border-b-2 md:border-b-0 md:border-r-2 border-audit-black">
+                <SharpSquare className="w-8 h-8 md:w-10 md:h-10 text-audit-orange mb-4 md:mb-6 group-hover:text-white" />
+                <h3 className="font-black text-lg md:text-xl mb-3 uppercase tracking-wide text-audit-black group-hover:text-white">1. Analiza</h3>
+                <p className="text-sm md:text-base font-medium text-audit-black group-hover:text-white leading-relaxed">Weryfikacja formy prawnej i przychodów.</p>
+              </div>
+              <div className="p-6 md:p-10 hover:bg-audit-black hover:text-white transition-colors group border-b-2 md:border-b-0 md:border-r-2 border-audit-black">
+                <SharpTriangle className="w-8 h-8 md:w-10 md:h-10 text-audit-orange mb-4 md:mb-6 group-hover:text-white" />
+                <h3 className="font-black text-lg md:text-xl mb-3 uppercase tracking-wide text-audit-black group-hover:text-white">2. Diagnoza</h3>
+                <p className="text-sm md:text-base font-medium text-audit-black group-hover:text-white leading-relaxed">Wykrycie nieefektywności podatkowych.</p>
+              </div>
+              <div className="p-6 md:p-10 hover:bg-audit-black hover:text-white transition-colors group">
+                <SharpCircle className="w-8 h-8 md:w-10 md:h-10 text-audit-orange mb-4 md:mb-6 group-hover:text-white" />
+                <h3 className="font-black text-lg md:text-xl mb-3 uppercase tracking-wide text-audit-black group-hover:text-white">3. Rozwiązanie</h3>
+                <p className="text-sm md:text-base font-medium text-audit-black group-hover:text-white leading-relaxed">Konkretna rekomendacja działań.</p>
+              </div>
+            </div>
+
+            <Button onClick={handleStart} variant="primary" className="text-lg md:text-2xl px-12 md:px-20 py-6 md:py-8 shadow-none w-full md:w-auto">
+              Rozpocznij Audyt
+            </Button>
+          </Wrapper>
+        </div>
+      );
+
+      const renderQuestions = () => {
+        const question = QUIZ_QUESTIONS[currentQuestionIndex];
+        const total = QUIZ_QUESTIONS.length;
+        const current = currentQuestionIndex + 1;
+
+        return (
+          <div className="flex-grow flex flex-col justify-center py-8 md:py-16">
+            <Wrapper className="max-w-4xl">
+              <div className="flex items-end gap-3 mb-12 md:mb-16 border-b-4 border-audit-black pb-4">
+                <span className="text-6xl md:text-8xl font-black text-audit-orange leading-none">0{current}</span>
+                <span className="text-xl md:text-2xl font-bold text-audit-black mb-2 md:mb-3">/ 0{total}</span>
+              </div>
+
+              <h2 className="text-3xl md:text-5xl font-black text-audit-black mb-12 md:mb-16 uppercase leading-tight">
+                {question.text}
+              </h2>
+
+              <div className="grid gap-4 md:gap-6">
+                {question.options.map((opt) => (
+                  <button
+                    key={opt.id}
+                    onClick={() => handleAnswer(question.id, opt.id)}
+                    className={`group relative border-2 p-6 md:p-8 text-left transition-all 
+                      ${answers[question.id] === opt.id 
+                        ? 'bg-audit-black border-audit-black text-white' 
+                        : 'bg-white border-audit-black text-audit-black hover:bg-audit-orange hover:border-audit-orange hover:text-white'
+                      }`}
+                  >
+                    <div className="flex items-center justify-between">
+                      <span className={`text-lg md:text-xl font-medium transition-colors pr-6`}>
+                        {opt.label}
+                      </span>
+                      <SharpSquare className={`w-6 h-6 flex-shrink-0 transition-colors ${answers[question.id] === opt.id ? 'text-white' : 'text-audit-black group-hover:text-white'}`} />
+                    </div>
+                  </button>
+                ))}
+              </div>
+
+              <div className="mt-8 flex justify-start">
+                <button 
+                    onClick={handleBack}
+                    className="group flex items-center gap-3 text-audit-black font-bold uppercase tracking-widest text-sm hover:text-audit-orange transition-colors py-4 pr-6"
+                >
+                    <SharpArrowLeft className="w-5 h-5 transition-transform group-hover:-translate-x-1" />
+                    <span>Wróć</span>
+                </button>
+              </div>
+            </Wrapper>
+          </div>
+        );
+      };
+
+      const renderResults = () => {
+        return (
+          <div className="flex-grow py-8 md:py-16">
+            <Wrapper>
+              <div className="border-b-4 border-audit-orange mb-12 md:mb-16 pb-6 md:pb-8">
+                 <h2 className="text-xs md:text-sm font-bold bg-audit-black text-white inline-block px-3 py-1 md:px-4 md:py-2 mb-4 uppercase tracking-widest">Raport Końcowy</h2>
+                 <h1 className="text-4xl md:text-7xl font-black text-audit-black uppercase tracking-tighter leading-none">Wynik Audytu</h1>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-20">
+                
+                <div className="flex flex-col gap-8">
+                  <div className="bg-audit-black text-white p-8 md:p-10 border-2 border-audit-black">
+                    <div className="flex items-center gap-4 mb-8">
+                      <SharpAlert className="w-10 h-10 md:w-12 md:h-12 text-white" />
+                      <h3 className="text-xl md:text-2xl font-black uppercase tracking-wide">Zidentyfikowane Obszary</h3>
+                    </div>
+                    
+                    <ul className="space-y-6">
+                      {resultRecommendation.features.map((feature, idx) => (
+                        <li key={idx} className="flex gap-4 items-start border-l-2 border-audit-orange pl-6">
+                          <div>
+                            <h4 className="font-bold text-audit-orange text-xs uppercase mb-2 tracking-widest">Akcja {idx + 1}</h4>
+                            <p className="text-white text-base md:text-lg font-medium leading-snug">{feature}</p>
+                          </div>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+
+                  <div className="border-2 border-audit-black p-8 md:p-10 bg-white">
+                     <h3 className="font-black text-2xl mb-2 text-audit-black uppercase">Twoja punktacja</h3>
+                     <div className="flex items-baseline gap-3 mb-2">
+                       <span className="text-6xl md:text-8xl font-black text-audit-orange">{score}</span>
+                       <span className="text-lg md:text-xl font-bold text-audit-black">pkt</span>
+                     </div>
+                     
+                     <ScoreLegend score={score} />
+                  </div>
+                </div>
+
+                <div className="flex flex-col justify-center">
+                  <div className="mb-12">
+                    <h3 className="text-audit-orange font-black uppercase tracking-widest mb-4 text-sm md:text-base">Rekomendowane Rozwiązanie</h3>
+                    <h2 className="text-3xl md:text-5xl font-black mb-8 leading-none text-audit-black">{resultRecommendation.title}</h2>
+                    <p className="text-lg md:text-2xl text-audit-black font-bold mb-8 border-l-4 border-audit-black pl-6 leading-tight">
+                      {resultRecommendation.description}
+                    </p>
+                    <p className="text-base md:text-lg text-audit-black font-medium leading-relaxed">
+                      Wdrożenie tego modelu pozwoli wyeliminować zidentyfikowane ryzyka i uporządkować strukturę kosztową Twojego przedsiębiorstwa.
+                    </p>
+                  </div>
+
+                  <div className="bg-white p-8 md:p-10 border-2 border-audit-black">
+                    <h3 className="font-black text-xl md:text-2xl mb-8 text-audit-black uppercase">Skorzystaj z oferty</h3>
+                    <div className="space-y-4">
+                      <Button 
+                        onClick={() => alert("Tutaj normalnie byłoby przekierowanie do formularza kontaktowego.")} 
+                        variant="primary" 
+                        fullWidth
+                        className="text-base md:text-lg w-full py-6"
+                      >
+                        {resultRecommendation.ctaText}
+                      </Button>
+                      <Button 
+                        onClick={handleStart} 
+                        variant="outline" 
+                        fullWidth
+                        className="text-base md:text-lg w-full py-6"
+                      >
+                        Powtórz Audyt
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </Wrapper>
+          </div>
+        );
+      };
+
+      return (
+        <div className="min-h-screen bg-white flex flex-col font-sans selection:bg-audit-orange selection:text-white">
+          <Logo onReset={handleReset} />
+          <main className="flex-grow flex flex-col relative z-10">
+            {step === QuizStep.WELCOME && renderWelcome()}
+            {step === QuizStep.QUESTIONS && renderQuestions()}
+            {step === QuizStep.RESULTS && renderResults()}
+          </main>
+        </div>
+      );
+    };
+
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(<App />);
+  </script>
+</body>
+</html>
