@@ -1,546 +1,1616 @@
 <!DOCTYPE html>
 <html lang="pl">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
-  <title>Audyt Podatkowy - Filipiak Babicz Tax</title>
-  
-  <script src="https://cdn.tailwindcss.com"></script>
-  
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Jost:wght@300;400;500;700;900&display=swap" rel="stylesheet">
-  
-  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-  
-  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mini-Audyt HR | Filipiak Babicz Legal</title>
 
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          fontFamily: {
-            sans: ['Jost', 'Futura', 'sans-serif'],
-          },
-          colors: {
-            audit: {
-              black: '#1d1d1b',
-              white: '#ffffff',
-              orange: '#e44100',
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+
+    <style>
+        :root {
+            --black: #1d1d1b;
+            --white: #ffffff;
+            --orange: #e44100;
+            --gray: #f5f5f5;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Futura, 'Trebuchet MS', Arial, sans-serif;
+            background: var(--white);
+            color: var(--black);
+            line-height: 1.5;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .quiz-section {
+            display: none;
+            min-height: 100vh;
+        }
+
+        .quiz-section.active {
+            display: flex;
+        }
+
+        /* LANDING */
+        #landing {
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 100px 40px;
+            text-align: center;
+            min-height: 100vh;
+        }
+
+        .hero-shape {
+            width: 60px;
+            height: 3px;
+            background: var(--orange);
+            margin: 0 auto 40px;
+        }
+
+        .hero-title {
+            font-size: 48px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: -0.5px;
+            line-height: 1.2;
+            margin-bottom: 25px;
+        }
+
+        .hero-title span {
+            display: block;
+            color: var(--orange);
+            margin-top: 8px;
+            font-weight: 300;
+        }
+
+        .hero-subtitle {
+            font-size: 17px;
+            font-weight: 300;
+            max-width: 700px;
+            margin: 0 auto 80px;
+            line-height: 1.7;
+            color: #666;
+        }
+
+        .hero-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 0;
+            width: 100%;
+            max-width: 1000px;
+            margin-bottom: 80px;
+            border: 1px solid #e0e0e0;
+        }
+
+        .hero-card {
+            padding: 60px 50px;
+            text-align: center;
+            border-bottom: 1px solid #e0e0e0;
+            transition: all 0.2s;
+            position: relative;
+        }
+
+        .hero-card::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 4px;
+            height: 100%;
+            background: var(--orange);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .hero-card:last-child {
+            border-bottom: none;
+        }
+
+        .hero-card:hover {
+            background: var(--gray);
+        }
+
+        .hero-card:hover::before {
+            opacity: 1;
+        }
+
+        .card-icon-shape {
+            display: none;
+        }
+
+        .card-label {
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            margin-bottom: 12px;
+            color: var(--orange);
+        }
+
+        .card-text {
+            font-size: 16px;
+            font-weight: 300;
+            line-height: 1.7;
+            color: #666;
+        }
+
+        /* BUTTONS */
+        button {
+            font-family: Futura, 'Trebuchet MS', Arial, sans-serif;
+            font-size: 11px;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            padding: 14px 32px;
+            border: 1px solid #e0e0e0;
+            background: var(--white);
+            color: var(--black);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        button:hover:not(:disabled) {
+            background: var(--gray);
+            border-color: var(--black);
+        }
+
+        button.primary {
+            background: var(--orange);
+            border-color: var(--orange);
+            color: var(--white);
+            padding: 16px 40px;
+        }
+
+        button.primary:hover:not(:disabled) {
+            background: #d13a00;
+            border-color: #d13a00;
+        }
+
+        button:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        button:disabled:hover {
+            transform: none;
+            box-shadow: none;
+        }
+
+        /* CONTENT */
+        .wrapper {
+            width: 100%;
+            max-width: 700px;
+            margin: 0 auto;
+            padding: 60px 20px;
+        }
+
+        .page-icon {
+            width: 40px;
+            height: 2px;
+            background: var(--orange);
+            margin: 0 auto 25px;
+        }
+
+        .page-title {
+            font-size: 28px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: -0.5px;
+            text-align: center;
+            margin-bottom: 15px;
+            line-height: 1.2;
+        }
+
+        .page-subtitle {
+            font-size: 14px;
+            font-weight: 400;
+            text-align: center;
+            margin-bottom: 40px;
+            color: #666;
+            line-height: 1.6;
+        }
+
+        .divider {
+            width: 60px;
+            height: 2px;
+            background: var(--orange);
+            margin: 40px auto;
+        }
+
+        /* RADIO */
+        .label {
+            font-size: 10px;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 15px;
+            display: block;
+            color: var(--black);
+        }
+
+        .radio-group {
+            margin-bottom: 30px;
+        }
+
+        .radio-item {
+            position: relative;
+            margin-bottom: 10px;
+        }
+
+        .radio-item input {
+            position: absolute;
+            opacity: 0;
+        }
+
+        .radio-item label {
+            display: block;
+            padding: 16px 20px;
+            border: 1px solid #e0e0e0;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 14px;
+            font-weight: 400;
+            line-height: 1.5;
+            position: relative;
+        }
+
+        .radio-item label::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 3px;
+            height: 100%;
+            background: var(--orange);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .radio-item label:hover {
+            background: rgba(228,65,0,0.02);
+            border-color: var(--orange);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .radio-item label:hover::before {
+            opacity: 0.5;
+        }
+
+        .radio-item input:checked + label {
+            background: var(--orange);
+            border-color: var(--orange);
+            color: var(--white);
+            font-weight: 700;
+            box-shadow: 0 2px 12px rgba(228,65,0,0.2);
+        }
+
+        .radio-item input:checked + label::before {
+            opacity: 1;
+            background: var(--black);
+        }
+
+        /* PROGRESS */
+        .progress {
+            margin-bottom: 30px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 4px;
+            background: var(--gray);
+            margin-bottom: 8px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--orange);
+            transition: width 0.3s;
+            box-shadow: 0 0 4px var(--orange);
+        }
+
+        .progress-text {
+            font-size: 11px;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            text-align: right;
+            color: var(--orange);
+        }
+
+        /* QUESTION */
+        .q-category {
+            font-size: 10px;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 14px;
+        }
+
+        .q-category.b2b {
+            color: var(--orange);
+            background: rgba(228,65,0,0.1);
+            padding: 4px 10px;
+            display: inline-block;
+        }
+
+        .q-text {
+            font-size: 16px;
+            font-weight: 700;
+            line-height: 1.4;
+            margin-bottom: 25px;
+        }
+
+        .answers {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 25px;
+        }
+
+        .answer-btn {
+            text-align: left;
+            padding: 14px 15px;
+            font-size: 14px;
+            font-weight: 700;
+            line-height: 1.4;
+        }
+
+        .answer-btn.selected {
+            background: var(--orange);
+            border-color: var(--orange);
+            color: var(--white);
+            border-width: 2px;
+        }
+
+        .nav {
+            display: flex;
+            gap: 12px;
+        }
+
+        .nav button {
+            flex: 1;
+        }
+
+        /* FORM */
+        .form-intro {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .benefits {
+            list-style: none;
+            max-width: 400px;
+            margin: 0 auto 30px;
+            padding: 18px;
+            border: 2px solid var(--orange);
+            background: rgba(228,65,0,0.05);
+        }
+
+        .benefits li {
+            padding-left: 18px;
+            position: relative;
+            margin-bottom: 7px;
+            font-size: 14px;
+            font-weight: 400;
+            line-height: 1.5;
+        }
+
+        .benefits li:before {
+            content: '▲';
+            position: absolute;
+            left: 0;
+            color: var(--orange);
+            font-weight: 900;
+            font-size: 12px;
+        }
+
+        #form {
+            max-width: 480px;
+            margin: 0 auto;
+        }
+
+        #form label {
+            display: block;
+            font-size: 11px;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+        }
+
+        #form input {
+            width: 100%;
+            padding: 13px;
+            border: 1px solid var(--black);
+            font-family: Futura, 'Trebuchet MS', Arial, sans-serif;
+            font-size: 14px;
+            font-weight: 400;
+            margin-bottom: 14px;
+        }
+
+        #form input:focus {
+            outline: none;
+            border-width: 2px;
+            border-color: var(--orange);
+        }
+
+        /* RESULTS */
+        .results-wrapper {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 50px 20px 60px;
+            background: var(--white);
+        }
+
+        .results-header {
+            text-align: center;
+            margin-bottom: 50px;
+            padding-bottom: 30px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .results-company {
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--orange);
+            margin-bottom: 10px;
+        }
+
+        .results-title {
+            font-size: 32px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: -0.5px;
+            margin-bottom: 15px;
+        }
+
+        .results-summary {
+            font-size: 14px;
+            font-weight: 400;
+            color: #666;
+            max-width: 600px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+
+        .risk-alert {
+            background: rgba(228,65,0,0.08);
+            border-left: 4px solid var(--orange);
+            padding: 25px 30px;
+            margin: 40px auto;
+            max-width: 700px;
+        }
+
+        .risk-alert-title {
+            font-size: 14px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--orange);
+            margin-bottom: 10px;
+        }
+
+        .risk-alert-text {
+            font-size: 15px;
+            line-height: 1.7;
+            color: var(--black);
+        }
+
+        .risk-alert-text strong {
+            font-weight: 700;
+            color: var(--orange);
+        }
+
+        /* Score Grid */
+        .score-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+            margin-bottom: 50px;
+            max-width: 900px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .score-card {
+            border: 1px solid #e0e0e0;
+            padding: 30px;
+            text-align: center;
+            background: var(--white);
+            position: relative;
+            transition: all 0.3s;
+        }
+
+        .score-card:hover {
+            border-color: var(--orange);
+            box-shadow: 0 4px 20px rgba(228,65,0,0.08);
+        }
+
+        .score-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: var(--orange);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .score-card:hover::before {
+            opacity: 1;
+        }
+
+        .score-big {
+            font-size: 56px;
+            font-weight: 900;
+            color: var(--orange);
+            line-height: 1;
+            margin-bottom: 12px;
+        }
+
+        .score-label {
+            font-size: 10px;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            line-height: 1.3;
+            color: #666;
+        }
+
+        /* Chart */
+        .chart-section {
+            margin-bottom: 60px;
+            padding: 40px 0;
+            background: var(--gray);
+        }
+
+        .chart-container {
+            max-width: 500px;
+            margin: 0 auto;
+            padding: 40px;
+            background: var(--white);
+            border: 1px solid #e0e0e0;
+        }
+
+        .section-title {
+            font-size: 14px;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 30px;
+            text-align: center;
+            color: var(--black);
+        }
+
+        /* Insights Grid */
+        .insights-section {
+            margin-bottom: 60px;
+        }
+
+        .insights-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .insight-card {
+            border: 1px solid #e0e0e0;
+            padding: 30px;
+            background: var(--white);
+            position: relative;
+            transition: all 0.3s;
+        }
+
+        .insight-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: var(--black);
+        }
+
+        .insight-card.critical::before {
+            background: var(--orange);
+            width: 5px;
+        }
+
+        .insight-card.critical {
+            border-color: var(--orange);
+            background: rgba(228,65,0,0.02);
+        }
+
+        .insight-card.normal {
+            background: var(--white);
+        }
+
+        .insight-card.positive {
+            border-color: #27ae60;
+            background: rgba(39,174,96,0.02);
+        }
+
+        .insight-card.positive::before {
+            background: #27ae60;
+        }
+
+        .insight-card:hover {
+            box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+        }
+
+        .insight-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+
+        .insight-icon {
+            font-size: 20px;
+            color: var(--black);
+        }
+
+        .insight-card.critical .insight-icon {
+            color: var(--orange);
+        }
+
+        .insight-title {
+            font-size: 12px;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            line-height: 1.3;
+        }
+
+        .insight-card.critical .insight-title {
+            color: var(--orange);
+        }
+
+        .insight-card.positive .insight-icon {
+            color: #27ae60;
+        }
+
+        .insight-card.positive .insight-title {
+            color: #27ae60;
+        }
+
+        .insight-text {
+            font-size: 13px;
+            font-weight: 400;
+            line-height: 1.6;
+            margin-bottom: 10px;
+        }
+
+        .insight-list {
+            list-style: none;
+            margin-top: 10px;
+        }
+
+        .insight-list li {
+            padding-left: 14px;
+            position: relative;
+            margin-bottom: 5px;
+            font-size: 12px;
+            font-weight: 400;
+            line-height: 1.5;
+        }
+
+        .insight-list li:before {
+            content: '—';
+            position: absolute;
+            left: 0;
+            font-weight: 700;
+            color: var(--orange);
+        }
+
+        /* CTA Section */
+        .cta-section {
+            border: 1px solid #e0e0e0;
+            padding: 50px 40px;
+            margin-bottom: 40px;
+            background: var(--gray);
+        }
+
+        .cta-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .cta-main-title {
+            font-size: 24px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: -0.3px;
+            margin-bottom: 20px;
+            color: var(--black);
+        }
+
+        .cta-subtitle {
+            font-size: 14px;
+            font-weight: 400;
+            max-width: 600px;
+            margin: 0 auto;
+            line-height: 1.7;
+            color: #666;
+        }
+
+        .cta-content {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 25px;
+        }
+
+        .cta-features {
+            list-style: none;
+        }
+
+        .cta-features li {
+            padding-left: 20px;
+            position: relative;
+            margin-bottom: 8px;
+            font-size: 13px;
+            font-weight: 400;
+            line-height: 1.5;
+        }
+
+        .cta-features li:before {
+            content: '▲';
+            position: absolute;
+            left: 0;
+            color: var(--orange);
+            font-size: 12px;
+        }
+
+        .contact-form {
+            border: 1px solid #e0e0e0;
+            padding: 30px;
+            background: var(--white);
+        }
+
+        .form-title {
+            font-size: 12px;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 20px;
+            color: var(--black);
+        }
+
+        .contact-form label {
+            display: block;
+            font-size: 10px;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 6px;
+        }
+
+        .contact-form input,
+        .contact-form textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid var(--black);
+            font-family: Futura, 'Trebuchet MS', Arial, sans-serif;
+            font-size: 14px;
+            font-weight: 400;
+            margin-bottom: 12px;
+        }
+
+        .contact-form textarea {
+            min-height: 60px;
+            resize: vertical;
+        }
+
+        .contact-form input:focus,
+        .contact-form textarea:focus {
+            outline: none;
+            border-width: 2px;
+            border-color: var(--orange);
+        }
+
+        /* RESPONSIVE */
+        @media (max-width: 768px) {
+            #landing {
+                padding: 50px 20px;
             }
-          },
-          screens: {
-            'lg': '1024px',
-            'tall': {'raw': '(min-height: 850px)'},
-          },
-          borderRadius: {
-            DEFAULT: '0px',
-            full: '0px',
-          }
+
+            .hero-shape {
+                width: 40px;
+                height: 2px;
+                margin-bottom: 30px;
+            }
+
+            .hero-title {
+                font-size: 32px;
+            }
+
+            .hero-subtitle {
+                font-size: 14px;
+                margin-bottom: 40px;
+            }
+
+            .hero-grid {
+                margin-bottom: 40px;
+            }
+
+            .hero-card {
+                padding: 25px;
+            }
+
+            .card-text {
+                font-size: 14px;
+            }
+
+            .page-title, .results-title {
+                font-size: 24px;
+            }
+
+            .q-text {
+                font-size: 15px;
+            }
+
+            .score-big {
+                font-size: 42px;
+            }
+
+            .results-wrapper {
+                padding: 40px 20px;
+            }
+
+            .chart-section {
+                padding: 30px 0;
+            }
+
+            .chart-container {
+                padding: 25px;
+            }
+
+            .cta-section {
+                padding: 35px 25px;
+            }
+
+            .contact-form {
+                padding: 25px;
+            }
+
+            .insight-card {
+                padding: 25px;
+            }
+
+            .nav {
+                flex-direction: column-reverse;
+            }
         }
-      }
-    }
-  </script>
-  <style>
-    body {
-      -webkit-font-smoothing: antialiased;
-      -moz-osx-font-smoothing: grayscale;
-      overflow-x: hidden;
-      -webkit-tap-highlight-color: transparent;
-    }
-    
-    ::-webkit-scrollbar {
-      width: 0px;
-      background: transparent;
-    }
-    
-    @media (min-width: 1024px) {
-      body {
-        overflow: hidden;
-      }
-    }
-  </style>
+
+        @media (min-width: 769px) {
+            .hero-grid {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 0;
+            }
+
+            .hero-card {
+                border-bottom: none;
+                border-right: 1px solid #e0e0e0;
+                padding: 65px 60px;
+            }
+
+            .hero-card:last-child {
+                border-right: none;
+            }
+
+            .hero-card::before {
+                width: 100%;
+                height: 3px;
+                top: 0;
+                left: 0;
+            }
+
+            .score-grid {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 20px;
+            }
+
+            .insights-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 16px;
+            }
+
+            .cta-content {
+                grid-template-columns: 1fr 1fr;
+                gap: 25px;
+            }
+
+            .chart-container {
+                max-width: 450px;
+                padding: 35px;
+            }
+
+            .score-grid {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 25px;
+            }
+        }
+    </style>
 </head>
-<body class="bg-audit-white text-audit-black min-h-screen lg:h-screen w-screen flex flex-col">
-  <div id="root" class="flex-1 flex flex-col w-full"></div>
+<body>
 
-  <script type="text/babel">
-    const { useState, useMemo, useEffect } = React;
+<div id="container">
 
-    const QuizStep = {
-      WELCOME: 0,
-      QUESTIONS: 1,
-      RESULTS: 2
-    };
+    <!-- LANDING -->
+    <section id="landing" class="quiz-section active">
+        <div class="hero-shape"></div>
+        <h1 class="hero-title">AUDYT HR<span>W PRAWIE PRACY</span></h1>
+        <p class="hero-subtitle">
+            Kompleksowa analiza ryzyka prawnego w obszarze zatrudnienia. Sprawdź zgodność Twojej firmy z przepisami prawa pracy w 5 minut i otrzymaj spersonalizowane rekomendacje od specjalistów.
+        </p>
 
-    const QUIZ_QUESTIONS = [
-      {
-        id: 1,
-        text: "Jaka jest forma prawna Twojego biznesu?",
-        options: [
-          { id: 'q1_a', label: "JDG / Spółka Cywilna", scoreValue: 10 },
-          { id: 'q1_b', label: "Spółka z o.o. / Komandytowa", scoreValue: 20 },
-          { id: 'q1_c', label: "Spółka Akcyjna / Grupa Kapitałowa", scoreValue: 30 },
-          { id: 'q1_d', label: "Fundacja / Stowarzyszenie", scoreValue: 15 }
-        ]
-      },
-      {
-        id: 2,
-        text: "Jaka jest roczna skala przychodów?",
-        options: [
-          { id: 'q2_a', label: "Do 2 mln EUR (Mały Podatnik)", scoreValue: 10 },
-          { id: 'q2_b', label: "2 mln EUR - 50 mln EUR", scoreValue: 20 },
-          { id: 'q2_c', label: "Powyżej 50 mln EUR (Duży Podatnik)", scoreValue: 30 }
-        ]
-      },
-      {
-        id: 3,
-        text: "Czy występują transakcje z podmiotami powiązanymi?",
-        options: [
-          { id: 'q3_a', label: "Nie, brak powiązań", scoreValue: 0 },
-          { id: 'q3_b', label: "Tak, wyłącznie krajowe", scoreValue: 15 },
-          { id: 'q3_c', label: "Tak, transgraniczne (Ceny Transferowe)", scoreValue: 25 }
-        ]
-      },
-      {
-        id: 4,
-        text: "Z jakich preferencji podatkowych korzystasz?",
-        options: [
-          { id: 'q4_a', label: "Zasady ogólne / Podatek liniowy", scoreValue: 10 },
-          { id: 'q4_b', label: "CIT Estoński", scoreValue: 20 },
-          { id: 'q4_c', label: "Ulga B+R / IP Box / PSI", scoreValue: 30 }
-        ]
-      },
-      {
-        id: 5,
-        text: "Jaki jest priorytet w zarządzaniu podatkami?",
-        options: [
-          { id: 'q5_a', label: "Bezpieczeństwo i Compliance (KKS)", scoreValue: 20 },
-          { id: 'q5_b', label: "Efektywność podatkowa (Cashflow)", scoreValue: 30 },
-          { id: 'q5_c', label: "Outsourcing procesów (Oszczędność czasu)", scoreValue: 10 }
-        ]
-      }
-    ];
-
-    const RECOMMENDATIONS = [
-      {
-        id: 'compliance',
-        title: "Tax Compliance & Księgowość",
-        description: "Twoja struktura wymaga solidnego fundamentu. Rekomendujemy przejęcie odpowiedzialności za rozliczenia podatkowe, co zapewni bezpieczeństwo zarządu i terminowość deklaracji.",
-        features: [
-          "Pełna obsługa księgowa (CIT/VAT)",
-          "Weryfikacja Jednolitego Pliku Kontrolnego",
-          "Reprezentacja podczas kontroli KAS",
-          "Monitoring zmian w prawie"
-        ],
-        ctaText: "Zapytaj o Ofertę Compliance",
-        minScore: 0,
-        maxScore: 65
-      },
-      {
-        id: 'advisory',
-        title: "Doradztwo Podatkowe i Strategia",
-        description: "Skala Twojego biznesu otwiera możliwości optymalizacji. Proponujemy wdrożenie CIT Estońskiego lub ulg technologicznych (B+R/IP Box) pod nadzorem Doradcy Podatkowego.",
-        features: [
-          "Wdrożenie CIT Estońskiego",
-          "Ulgi proinnowacyjne (B+R, IP Box)",
-          "Optymalizacja formy opodatkowania",
-          "Zabezpieczenie majątku prywatnego"
-        ],
-        ctaText: "Umów Konsultację Strategiczną",
-        minScore: 66,
-        maxScore: 100
-      },
-      {
-        id: 'expert',
-        title: "Audyt i Ceny Transferowe",
-        description: "Złożoność Twoich operacji wymaga zaawansowanego nadzoru. Rekomendujemy audyt procedur podatkowych oraz weryfikację dokumentacji cen transferowych (TP) w celuitygacji ryzyk.",
-        features: [
-          "Audyt bezpieczeństwa podatkowego",
-          "Dokumentacja Cen Transferowych",
-          "Procedury należytej staranności (WHT)",
-          "Interpretacje indywidualne i WIS"
-        ],
-        ctaText: "Skonsultuj z Ekspertem",
-        minScore: 101,
-        maxScore: 999
-      }
-    ];
-
-    const Button = ({ children, variant = 'primary', fullWidth = false, className = '', ...props }) => {
-      const baseStyles = "px-6 py-4 lg:py-3 tall:px-8 tall:py-4 text-sm uppercase tracking-widest font-bold transition-all duration-150 disabled:opacity-50 disabled:cursor-not-allowed border-2 active:scale-95 lg:active:scale-100";
-      
-      const variants = {
-        primary: "bg-audit-orange border-audit-orange text-white lg:hover:bg-white lg:hover:text-audit-orange",
-        outline: "bg-transparent border-audit-black text-audit-black lg:hover:bg-audit-black lg:hover:text-white",
-        black: "bg-audit-black border-audit-black text-white lg:hover:bg-audit-orange lg:hover:border-audit-orange"
-      };
-
-      const widthClass = fullWidth ? "w-full" : "";
-
-      return (
-        <button 
-          className={`${baseStyles} ${variants[variant]} ${widthClass} ${className}`}
-          {...props}
-        >
-          {children}
-        </button>
-      );
-    };
-
-    const SharpSquare = (props) => (
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="square" strokeLinejoin="miter" {...props}>
-        <rect x="3" y="3" width="18" height="18" />
-      </svg>
-    );
-
-    const SharpTriangle = (props) => (
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="square" strokeLinejoin="miter" {...props}>
-        <path d="M12 3L22 21H2L12 3Z" />
-      </svg>
-    );
-
-    const SharpAlert = (props) => (
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="square" strokeLinejoin="miter" {...props}>
-        <path d="M12 3L22 21H2L12 3Z" />
-        <path d="M12 9v4" />
-        <rect x="11" y="17" width="2" height="2" fill="currentColor" stroke="none" />
-      </svg>
-    );
-
-    const SharpCircle = (props) => (
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="square" strokeLinejoin="miter" {...props}>
-        <circle cx="12" cy="12" r="10" />
-      </svg>
-    );
-    
-    const SharpArrowLeft = (props) => (
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="square" strokeLinejoin="miter" {...props}>
-        <path d="M19 12H5" />
-        <path d="M12 19L5 12L12 5" />
-      </svg>
-    );
-
-    const ScoreLegend = ({ score, maxScore }) => {
-      const percentage = Math.min(100, Math.max(0, (score / maxScore) * 100));
-      
-      return (
-        <div className="mt-4 tall:mt-8 pt-4 tall:pt-6 border-t-2 border-audit-black">
-          <h4 className="font-black text-audit-black uppercase tracking-widest mb-2 tall:mb-4 text-xs md:text-sm">Poziom Ryzyka Podatkowego</h4>
-          
-          <div className="relative h-6 tall:h-10 border-2 border-audit-black bg-white w-full mb-2">
-            <div className="absolute inset-0 flex pointer-events-none">
-               <div className="w-1/3 h-full border-r-2 border-audit-black"></div>
-               <div className="w-1/3 h-full border-r-2 border-audit-black"></div>
-               <div className="w-1/3 h-full"></div>
+        <div class="hero-grid">
+            <div class="hero-card">
+                <div class="card-icon-shape square"></div>
+                <div class="card-label">Analiza dokumentacji</div>
+                <div class="card-text">Weryfikacja kompletności i zgodności umów, zakresów obowiązków oraz akt osobowych z wymogami prawnymi</div>
             </div>
-
-            <div 
-              className="absolute top-0 left-0 bottom-0 bg-audit-orange transition-all duration-1000 ease-out mix-blend-multiply"
-              style={{ width: `${percentage}%` }}
-            ></div>
-          </div>
-
-          <div className="flex justify-between text-[10px] md:text-sm font-bold uppercase tracking-wider text-audit-black leading-tight">
-            <div className="w-1/3 pr-1 md:pr-2">
-              <span className="block text-audit-orange mb-1">Standard</span>
-              <span>Niski</span>
+            <div class="hero-card">
+                <div class="card-icon-shape triangle"></div>
+                <div class="card-label">Diagnoza ryzyka</div>
+                <div class="card-text">Identyfikacja obszarów krytycznych, ze szczególnym uwzględnieniem ryzyka przekwalifikowania umów B2B</div>
             </div>
-            <div className="w-1/3 px-1 md:px-2 text-center">
-              <span className="block text-audit-orange mb-1">Advanced</span>
-              <span>Średni</span>
+            <div class="hero-card">
+                <div class="card-icon-shape circle"></div>
+                <div class="card-label">Działania naprawcze</div>
+                <div class="card-text">Konkretne rekomendacje i plan wdrożenia rozwiązań minimalizujących ryzyko kar i kontroli</div>
             </div>
-            <div className="w-1/3 pl-1 md:pl-2 text-right">
-              <span className="block text-audit-orange mb-1">Complex</span>
-              <span>Wysoki</span>
-            </div>
-          </div>
         </div>
-      );
-    };
 
-    const Logo = ({ onReset }) => (
-      <div className="w-full py-4 lg:py-4 tall:py-10 px-6 md:px-12 max-w-6xl mx-auto flex-none relative z-50">
-        <div className="inline-block cursor-pointer" onClick={onReset}>
-           <img 
-             src="https://www.filipiakbabicz.com/wp-content/uploads/2024/03/logo.png" 
-             alt="Filipiak Babicz Tax" 
-             className="h-8 lg:h-10 tall:h-24 w-auto object-contain"
-           />
-        </div>
-      </div>
-    );
+        <button id="start1" class="primary">ROZPOCZNIJ AUDYT</button>
+    </section>
 
-    const App = () => {
-      const [step, setStep] = useState(QuizStep.WELCOME);
-      const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-      const [answers, setAnswers] = useState({});
-      
-      const maxPossibleScore = useMemo(() => {
-        return QUIZ_QUESTIONS.reduce((total, q) => {
-          const maxOptionScore = Math.max(...q.options.map(o => o.scoreValue));
-          return total + maxOptionScore;
-        }, 0);
-      }, []);
+    <!-- INTRO -->
+    <section id="intro" class="quiz-section">
+        <div class="wrapper">
+            <div class="page-icon"></div>
+            <h1 class="page-title">KONTEKST FIRMY</h1>
+            <p class="page-subtitle">Odpowiedz na 2 pytania wstępne</p>
 
-      const score = useMemo(() => {
-        return Object.entries(answers).reduce((total, [qId, aId]) => {
-          const question = QUIZ_QUESTIONS.find(q => q.id === Number(qId));
-          const option = question?.options.find(opt => opt.id === aId);
-          return total + (option?.scoreValue || 0);
-        }, 0);
-      }, [answers]);
+            <div class="divider"></div>
 
-      const handleStart = () => {
-        window.scrollTo(0,0);
-        setStep(QuizStep.QUESTIONS);
-        setCurrentQuestionIndex(0);
-        setAnswers({});
-      };
-
-      const handleReset = () => {
-        window.scrollTo(0,0);
-        setStep(QuizStep.WELCOME);
-      };
-
-      const handleAnswer = (questionId, answerId) => {
-        setAnswers(prev => ({ ...prev, [questionId]: answerId }));
-
-        if (currentQuestionIndex < QUIZ_QUESTIONS.length - 1) {
-          setTimeout(() => {
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-            setCurrentQuestionIndex(prev => prev + 1);
-          }, 250);
-        } else {
-          setTimeout(() => {
-            window.scrollTo(0,0);
-            setStep(QuizStep.RESULTS);
-          }, 250);
-        }
-      };
-
-      const handleBack = () => {
-        if (currentQuestionIndex > 0) {
-          setCurrentQuestionIndex(prev => prev - 1);
-        } else {
-          setStep(QuizStep.WELCOME);
-        }
-      };
-
-      const resultRecommendation = useMemo(() => {
-        return RECOMMENDATIONS.find(rec => score >= rec.minScore && score <= rec.maxScore) || RECOMMENDATIONS[0];
-      }, [score]);
-
-      const Wrapper = ({ children, className = "" }) => (
-        <div className={`max-w-6xl mx-auto px-6 md:px-12 w-full h-full flex flex-col ${className}`}>
-          {children}
-        </div>
-      );
-
-      const renderWelcome = () => (
-        <div className="flex-1 flex flex-col justify-center items-center py-8 lg:py-2 tall:py-8 lg:overflow-hidden pb-12 tall:pb-20">
-          <Wrapper className="items-center justify-center">
-            <div className="w-16 lg:w-20 tall:w-24 h-2 bg-audit-orange mb-8 lg:mb-6 tall:mb-10 flex-none"></div>
-            
-            <h1 className="text-4xl sm:text-6xl lg:text-7xl tall:text-9xl font-black text-audit-black mb-6 lg:mb-4 tall:mb-6 tracking-tighter uppercase text-center leading-[0.9] flex-none">
-              Audyt<br />
-              <span className="text-audit-orange">Podatkowy</span>
-            </h1>
-            
-            <p className="text-base lg:text-xl tall:text-2xl text-audit-black font-bold mb-10 lg:mb-8 tall:mb-16 max-w-2xl text-center leading-normal flex-none">
-              Sprawdź bezpieczeństwo Twojej firmy w 5 krokach. Zidentyfikuj ryzyka podatkowe. Odbierz strategię.
-            </p>
-
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-0 w-full mb-10 lg:mb-8 tall:mb-16 border-2 border-audit-black flex-none">
-              <div className="p-6 lg:p-6 tall:p-8 transition-colors group border-b-2 lg:border-b-0 lg:border-r-2 border-audit-black 
-                              active:bg-audit-black lg:hover:bg-audit-black">
-                <SharpSquare className="w-8 h-8 lg:w-8 lg:h-8 tall:w-10 tall:h-10 text-audit-orange mb-3 lg:mb-4 tall:mb-6 
-                                        group-active:text-white lg:group-hover:text-white" />
-                <h3 className="font-black text-lg lg:text-lg tall:text-xl mb-2 lg:mb-2 tall:mb-3 uppercase tracking-wide text-audit-black 
-                               group-active:text-white lg:group-hover:text-white">1. Analiza</h3>
-                <p className="text-sm lg:text-sm tall:text-base font-medium text-audit-black leading-relaxed
-                              group-active:text-white lg:group-hover:text-white">Weryfikacja formy prawnej i przychodów.</p>
-              </div>
-              <div className="p-6 lg:p-6 tall:p-8 transition-colors group border-b-2 lg:border-b-0 lg:border-r-2 border-audit-black
-                              active:bg-audit-black lg:hover:bg-audit-black">
-                <SharpTriangle className="w-8 h-8 lg:w-8 lg:h-8 tall:w-10 tall:h-10 text-audit-orange mb-3 lg:mb-4 tall:mb-6 
-                                          group-active:text-white lg:group-hover:text-white" />
-                <h3 className="font-black text-lg lg:text-lg tall:text-xl mb-2 lg:mb-2 tall:mb-3 uppercase tracking-wide text-audit-black 
-                               group-active:text-white lg:group-hover:text-white">2. Diagnoza</h3>
-                <p className="text-sm lg:text-sm tall:text-base font-medium text-audit-black leading-relaxed
-                              group-active:text-white lg:group-hover:text-white">Wykrycie nieefektywności podatkowych.</p>
-              </div>
-              <div className="p-6 lg:p-6 tall:p-8 transition-colors group
-                              active:bg-audit-black lg:hover:bg-audit-black">
-                <SharpCircle className="w-8 h-8 lg:w-8 lg:h-8 tall:w-10 tall:h-10 text-audit-orange mb-3 lg:mb-4 tall:mb-6 
-                                        group-active:text-white lg:group-hover:text-white" />
-                <h3 className="font-black text-lg lg:text-lg tall:text-xl mb-2 lg:mb-2 tall:mb-3 uppercase tracking-wide text-audit-black 
-                               group-active:text-white lg:group-hover:text-white">3. Rozwiązanie</h3>
-                <p className="text-sm lg:text-sm tall:text-base font-medium text-audit-black leading-relaxed
-                              group-active:text-white lg:group-hover:text-white">Konkretna rekomendacja działań.</p>
-              </div>
+            <span class="label">Ilu pracowników zatrudnia firma?</span>
+            <div class="radio-group">
+                <div class="radio-item">
+                    <input type="radio" id="s1" name="size" value="1-10">
+                    <label for="s1">1-10</label>
+                </div>
+                <div class="radio-item">
+                    <input type="radio" id="s2" name="size" value="11-50">
+                    <label for="s2">11-50</label>
+                </div>
+                <div class="radio-item">
+                    <input type="radio" id="s3" name="size" value="51-250">
+                    <label for="s3">51-250</label>
+                </div>
+                <div class="radio-item">
+                    <input type="radio" id="s4" name="size" value="250+">
+                    <label for="s4">250+</label>
+                </div>
             </div>
 
-            <Button onClick={handleStart} variant="primary" className="text-lg lg:text-lg tall:text-2xl px-12 tall:px-20 py-5 lg:py-4 tall:py-8 shadow-none w-full md:w-auto flex-none">
-              Rozpocznij Audyt
-            </Button>
-          </Wrapper>
+            <span class="label">Czy zatrudniacie osoby na B2B?</span>
+            <div class="radio-group">
+                <div class="radio-item">
+                    <input type="radio" id="b1" name="b2b" value="yes">
+                    <label for="b1">Tak</label>
+                </div>
+                <div class="radio-item">
+                    <input type="radio" id="b2" name="b2b" value="no">
+                    <label for="b2">Nie</label>
+                </div>
+                <div class="radio-item">
+                    <input type="radio" id="b3" name="b2b" value="unknown">
+                    <label for="b3">Nie wiem</label>
+                </div>
+            </div>
+
+            <div class="divider"></div>
+
+            <button id="start2" class="primary" disabled style="width: 100%;">ROZPOCZNIJ PYTANIA</button>
         </div>
-      );
+    </section>
 
-      const renderQuestions = () => {
-        const question = QUIZ_QUESTIONS[currentQuestionIndex];
-        const total = QUIZ_QUESTIONS.length;
-        const current = currentQuestionIndex + 1;
+    <!-- QUESTIONS -->
+    <section id="questions" class="quiz-section">
+        <div class="wrapper">
+            <div class="progress">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="prog"></div>
+                </div>
+                <div class="progress-text" id="prog-text">1 / 15</div>
+            </div>
 
-        return (
-          <div className="flex-1 flex flex-col justify-center py-8 lg:py-4 tall:py-8 lg:overflow-hidden pb-12 tall:pb-20">
-            <Wrapper className="max-w-4xl justify-center" key={currentQuestionIndex}>
-              <div className="flex items-end gap-3 mb-8 lg:mb-6 tall:mb-16 border-b-4 border-audit-black pb-4 lg:pb-2 tall:pb-4 flex-none">
-                <span className="text-6xl lg:text-6xl tall:text-8xl font-black text-audit-orange leading-none">0{current}</span>
-                <span className="text-xl lg:text-xl tall:text-2xl font-bold text-audit-black mb-2 tall:mb-3">/ 0{total}</span>
-              </div>
+            <div class="divider"></div>
 
-              <h2 className="text-2xl lg:text-3xl tall:text-5xl font-black text-audit-black mb-8 lg:mb-6 tall:mb-16 uppercase leading-tight flex-none">
-                {question.text}
-              </h2>
+            <div id="q-content"></div>
 
-              <div className="grid gap-4 lg:gap-3 tall:gap-6 flex-none">
-                {question.options.map((opt) => (
-                  <button
-                    key={opt.id}
-                    onClick={() => handleAnswer(question.id, opt.id)}
-                    className={`group relative border-2 p-5 lg:p-4 tall:p-8 text-left transition-all duration-150 active:scale-[0.98] lg:active:scale-95
-                      ${answers[question.id] === opt.id 
-                        ? 'bg-audit-orange border-audit-orange text-white' 
-                        : 'bg-white border-audit-black text-audit-black hover:border-audit-orange hover:text-audit-orange active:bg-audit-orange active:border-audit-orange active:text-white'
-                      }`}
-                  >
-                    <div className="flex items-center justify-between">
-                      <span className={`text-base lg:text-base tall:text-xl font-medium transition-colors pr-6`}>
-                        {opt.label}
-                      </span>
-                      <SharpSquare className={`w-6 h-6 lg:w-5 lg:h-5 tall:w-6 tall:h-6 flex-shrink-0 transition-colors 
-                        ${answers[question.id] === opt.id 
-                          ? 'text-white' 
-                          : 'text-audit-black group-hover:text-audit-orange group-active:text-white'}`} 
-                      />
-                    </div>
-                  </button>
-                ))}
-              </div>
+            <div class="divider"></div>
 
-              <div className="mt-8 lg:mt-6 tall:mt-8 flex justify-start flex-none">
-                <button 
-                    onClick={handleBack}
-                    className="group flex items-center gap-3 text-audit-black font-bold uppercase tracking-widest text-sm hover:text-audit-orange transition-colors py-4 pr-6"
-                >
-                    <SharpArrowLeft className="w-5 h-5 transition-transform group-hover:-translate-x-1" />
-                    <span>Wróć</span>
-                </button>
-              </div>
-            </Wrapper>
-          </div>
-        );
-      };
+            <div class="nav">
+                <button id="prev">← WSTECZ</button>
+                <button id="next" class="primary" disabled>DALEJ →</button>
+            </div>
+        </div>
+    </section>
 
-      const renderResults = () => {
-        return (
-          <div className="flex-1 py-8 lg:py-4 tall:py-8 lg:overflow-y-auto pb-20 tall:pb-32">
-            <Wrapper>
-              <div className="border-b-4 border-audit-orange mb-8 lg:mb-6 tall:mb-12 pb-6 lg:pb-4 tall:pb-8 flex-none">
-                 <h2 className="text-xs tall:text-sm font-bold bg-audit-black text-white inline-block px-3 py-1 tall:px-4 tall:py-2 mb-3 lg:mb-2 tall:mb-4 uppercase tracking-widest">Raport Końcowy</h2>
-                 <h1 className="text-4xl lg:text-5xl tall:text-7xl font-black text-audit-black uppercase tracking-tighter leading-none">Wynik Audytu</h1>
-              </div>
+    <!-- LEAD FORM -->
+    <section id="lead" class="quiz-section">
+        <div class="wrapper">
+            <div class="form-intro">
+                <div class="page-icon">●</div>
+                <h1 class="page-title">RAPORT GOTOWY</h1>
+                <p class="page-subtitle">Zostaw dane, aby otrzymać wyniki</p>
+            </div>
 
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-8 tall:gap-20">
-                
-                <div className="flex flex-col gap-8 lg:gap-6 tall:gap-8 order-2 lg:order-1">
-                  <div className="bg-audit-black text-white p-8 lg:p-6 tall:p-10 border-2 border-audit-black">
-                    <div className="flex items-center gap-4 mb-6 lg:mb-4 tall:mb-8">
-                      <SharpAlert className="w-10 h-10 lg:w-8 lg:h-8 tall:w-12 tall:h-12 text-white" />
-                      <h3 className="text-xl lg:text-xl tall:text-2xl font-black uppercase tracking-wide">Zidentyfikowane Ryzyka</h3>
-                    </div>
-                    
-                    <ul className="space-y-6 lg:space-y-4 tall:space-y-6">
-                      {resultRecommendation.features.map((feature, idx) => (
-                        <li key={idx} className="flex gap-4 items-start border-l-2 border-audit-orange pl-6">
-                          <div>
-                            <h4 className="font-bold text-audit-orange text-xs uppercase mb-1 tall:mb-2 tracking-widest">Krok {idx + 1}</h4>
-                            <p className="text-white text-sm lg:text-sm tall:text-lg font-medium leading-snug">{feature}</p>
-                          </div>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
+            <ul class="benefits">
+                <li>Szczegółowa analiza ryzyka</li>
+                <li>Wykres 5 obszarów HR</li>
+                <li>Spersonalizowane rekomendacje</li>
+            </ul>
 
-                  <div className="border-2 border-audit-black p-8 lg:p-6 tall:p-10 bg-white">
-                     <h3 className="font-black text-xl tall:text-2xl mb-2 text-audit-black uppercase">Twoja punktacja</h3>
-                     <div className="flex items-baseline gap-3 mb-2">
-                       <span className="text-6xl lg:text-6xl tall:text-8xl font-black text-audit-orange">{score}</span>
-                       <span className="text-lg tall:text-xl font-bold text-audit-black">pkt</span>
-                     </div>
-                     
-                     <ScoreLegend score={score} maxScore={maxPossibleScore} />
-                  </div>
+            <div class="divider"></div>
+
+            <form id="form">
+                <input type="hidden" id="data">
+
+                <label for="email">Email*</label>
+                <input type="email" id="email" required placeholder="twoj@email.pl">
+
+                <label for="name">Imię i nazwisko</label>
+                <input type="text" id="name" placeholder="Jan Kowalski">
+
+                <label for="company">Firma*</label>
+                <input type="text" id="company" required placeholder="Nazwa firmy">
+
+                <label for="position">Stanowisko</label>
+                <input type="text" id="position" placeholder="HR Manager">
+
+                <label for="phone">Telefon</label>
+                <input type="tel" id="phone" placeholder="+48 123 456 789">
+
+                <div class="divider"></div>
+
+                <button type="submit" class="primary" style="width: 100%;">POKAŻ WYNIKI</button>
+            </form>
+        </div>
+    </section>
+
+    <!-- RESULTS -->
+    <section id="results" class="quiz-section">
+        <div class="results-wrapper">
+            <div class="results-header">
+                <p class="results-company" id="co-name"></p>
+                <h1 class="results-title">WYNIKI AUDYTU HR</h1>
+                <p class="results-summary">Kompleksowa analiza ryzyka prawnego w obszarze zatrudnienia i zgodności z przepisami prawa pracy</p>
+            </div>
+
+            <!-- Risk Alert Box -->
+            <div class="risk-alert" id="risk-alert"></div>
+
+            <!-- Score Cards -->
+            <div class="score-grid">
+                <div class="score-card">
+                    <div class="score-big" id="total-score">0</div>
+                    <div class="score-label" id="risk-label">RYZYKO</div>
+                </div>
+                <div class="score-card">
+                    <div class="score-big" style="font-size: 48px;" id="answered">15/15</div>
+                    <div class="score-label">PYTAŃ AUDYTU</div>
+                </div>
+                <div class="score-card">
+                    <div class="score-big" style="font-size: 48px;" id="critical-areas">0</div>
+                    <div class="score-label">OBSZARÓW KRYTYCZNYCH</div>
+                </div>
+            </div>
+
+            <!-- Chart -->
+            <div class="chart-section">
+                <h2 class="section-title">Analiza 5 obszarów prawnych</h2>
+                <div class="chart-container">
+                    <canvas id="chart"></canvas>
+                </div>
+            </div>
+
+            <!-- Detailed Insights -->
+            <div class="insights-section">
+                <h2 class="section-title" style="margin-bottom: 40px;">Priorytetowe rekomendacje</h2>
+                <div class="insights-grid" id="insights"></div>
+            </div>
+
+            <div class="divider"></div>
+
+            <!-- CTA Section -->
+            <div class="cta-section">
+                <div class="cta-header">
+                    <h2 class="cta-main-title">Kompleksowy Audyt HR</h2>
+                    <p class="cta-subtitle">
+                        Mini-audyt zidentyfikował kluczowe obszary ryzyka.
+                        Pełny Audyt HR obejmuje szczegółową analizę ponad 50 obszarów compliance w prawie pracy
+                        oraz dostarcza konkretny plan działań naprawczych, minimalizujący ryzyko sankcji finansowych i kontroli.
+                    </p>
                 </div>
 
-                <div className="flex flex-col justify-center order-1 lg:order-2">
-                  <div className="mb-10 lg:mb-6 tall:mb-12">
-                    <h3 className="text-audit-orange font-black uppercase tracking-widest mb-3 lg:mb-2 tall:mb-4 text-xs tall:text-base">Rekomendowane Rozwiązanie</h3>
-                    <h2 className="text-3xl lg:text-3xl tall:text-5xl font-black mb-6 lg:mb-4 tall:mb-8 leading-none text-audit-black">{resultRecommendation.title}</h2>
-                    <p className="text-lg lg:text-lg tall:text-2xl text-audit-black font-bold mb-6 lg:mb-4 tall:mb-8 border-l-4 border-audit-black pl-6 leading-tight">
-                      {resultRecommendation.description}
-                    </p>
-                    <p className="text-base lg:text-sm tall:text-lg text-audit-black font-medium leading-relaxed">
-                      Wdrożenie tego modelu pozwoli zminimalizować ryzyka podatkowe i usprawnić procesy wewnątrz Twojej organizacji.
-                    </p>
-                  </div>
-
-                  <div className="bg-white p-8 lg:p-6 tall:p-10 border-2 border-audit-black">
-                    <h3 className="font-black text-xl tall:text-2xl mb-6 lg:mb-4 tall:mb-8 text-audit-black uppercase">Skorzystaj z oferty</h3>
-                    <div className="space-y-4 lg:space-y-3 tall:space-y-4">
-                      <Button 
-                        onClick={() => alert("Tu będzie formularz kontaktowy")} 
-                        variant="primary" 
-                        fullWidth
-                        className="text-base tall:text-lg w-full py-5 lg:py-4 tall:py-6"
-                      >
-                        {resultRecommendation.ctaText}
-                      </Button>
-                      <Button 
-                        onClick={handleStart} 
-                        variant="outline" 
-                        fullWidth
-                        className="text-base tall:text-lg w-full py-5 lg:py-4 tall:py-6"
-                      >
-                        Powtórz Audyt
-                      </Button>
+                <div class="cta-content">
+                    <div>
+                        <h3 class="section-title" style="text-align: left; font-size: 13px; margin-bottom: 12px;">Zakres pełnego audytu</h3>
+                        <ul class="cta-features">
+                            <li>Analiza ponad 50 dokumentów HR (umowy, regulaminy, procedury)</li>
+                            <li>Weryfikacja zgodności z 12 obszarami prawa pracy</li>
+                            <li>Symulacja kontroli organów nadzoru (PIP, ZUS, UODO)</li>
+                            <li>Szczegółowy raport z hierarchią priorytetów</li>
+                            <li>Konkretne działania naprawcze gotowe do wdrożenia</li>
+                            <li>3-miesięczne wsparcie prawne w eliminacji ryzyk</li>
+                            <li>Gwarancja zgodności z przepisami prawa pracy</li>
+                        </ul>
                     </div>
-                  </div>
+
+                    <div class="contact-form">
+                        <h3 class="form-title">SKONTAKTUJ SIĘ</h3>
+                        <form id="contact-form">
+                            <label for="c-name">Imię i nazwisko*</label>
+                            <input type="text" id="c-name" required>
+
+                            <label for="c-email">Email*</label>
+                            <input type="email" id="c-email" required>
+
+                            <label for="c-phone">Telefon*</label>
+                            <input type="tel" id="c-phone" required>
+
+                            <label for="c-message">Wiadomość</label>
+                            <textarea id="c-message" placeholder="Opcjonalnie: opisz swoją sytuację"></textarea>
+
+                            <button type="submit" class="primary" style="width: 100%;">WYŚLIJ ZAPYTANIE</button>
+                        </form>
+                    </div>
                 </div>
-              </div>
-              <div className="h-24 w-full flex-none"></div>
-            </Wrapper>
-          </div>
-        );
-      };
+            </div>
 
-      return (
-        <div className="min-h-screen lg:h-screen w-screen bg-white flex flex-col font-sans selection:bg-audit-orange selection:text-white">
-          <Logo onReset={handleReset} />
-          <main className="flex-1 flex flex-col relative z-10 lg:overflow-hidden h-full">
-            {step === QuizStep.WELCOME && renderWelcome()}
-            {step === QuizStep.QUESTIONS && renderQuestions()}
-            {step === QuizStep.RESULTS && renderResults()}
-          </main>
+            <div style="text-align: center; margin-top: 50px; padding: 50px 30px; background: var(--white); border: 1px solid #e0e0e0;">
+                <div style="font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 15px; color: var(--orange);">Następny krok</div>
+                <div style="font-size: 28px; font-weight: 900; text-transform: uppercase; letter-spacing: -0.5px; margin-bottom: 20px; color: var(--black); line-height: 1.3;">Pełny Audyt HR</div>
+                <div style="font-size: 15px; font-weight: 400; margin-bottom: 35px; max-width: 600px; margin-left: auto; margin-right: auto; line-height: 1.7; color: #666;">
+                    Pełny audyt HR to kompleksowa analiza wszystkich obszarów prawa pracy w Państwa organizacji.
+                    Otrzymają Państwo szczegółowy raport oraz plan działań naprawczych, minimalizujący ryzyko sankcji i kontroli.
+                </div>
+                <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap; margin-bottom: 25px;">
+                    <button class="primary" onclick="window.location.href='https://oprawiehr.pl/audyt-hr/'" style="font-size: 12px; padding: 18px 45px; font-weight: 700;">Zamów audyt</button>
+                    <button onclick="window.print()" style="font-size: 12px; padding: 18px 35px;">Pobierz raport</button>
+                </div>
+                <div style="font-size: 11px; color: #999; margin-top: 15px; letter-spacing: 0.5px;">
+                    Realizacja: 7-14 dni &nbsp;&nbsp;·&nbsp;&nbsp; Bezpłatna konsultacja wstępna &nbsp;&nbsp;·&nbsp;&nbsp; Gwarancja satysfakcji
+                </div>
+            </div>
         </div>
-      );
-    };
+    </section>
 
-    const root = ReactDOM.createRoot(document.getElementById('root'));
-    root.render(<App />);
-  </script>
+</div>
+
+<script>
+const Q = [
+    {id:1,cat:'dokumentacja',label:'■ Dokumentacja pracownicza',text:'Czy wszyscy pracownicy otrzymują pisemną informację o warunkach zatrudnienia w ciągu 7 dni?',s:{tak:0,nie:50,niewiem:30}},
+    {id:2,cat:'dokumentacja',label:'■ Dokumentacja pracownicza',text:'Czy w firmie stosowane są pisemne zakresy obowiązków dla wszystkich stanowisk?',s:{tak:0,nie:50,niewiem:30}},
+    {id:3,cat:'dokumentacja',label:'■ Dokumentacja pracownicza',text:'Czy wszystkie akta osobowe są kompletne i przechowywane zgodnie z wymogami prawnymi?',s:{tak:0,nie:50,niewiem:30}},
+    {id:4,cat:'b2b',label:'▲ Ryzyko przekwalifikowania B2B',text:'Czy osoby na B2B wykonują takie same czynności jak pracownicy etatowi?',s:{tak:80,nie:0,niewiem:45}},
+    {id:5,cat:'b2b',label:'▲ Ryzyko przekwalifikowania B2B',text:'Czy osoby na B2B mają przypisane stałe godziny pracy i muszą pracować w siedzibie firmy?',s:{tak:80,nie:0,niewiem:45}},
+    {id:6,cat:'b2b',label:'▲ Ryzyko przekwalifikowania B2B',text:'Czy osoby na B2B mają przełożonego i muszą stosować się do jego poleceń służbowych?',s:{tak:80,nie:0,niewiem:45}},
+    {id:7,cat:'compliance',label:'● Compliance wewnętrzny',text:'Czy w firmie obowiązuje aktualny regulamin pracy lub regulamin wynagradzania?',s:{tak:0,nie:50,niewiem:30}},
+    {id:8,cat:'compliance',label:'● Compliance wewnętrzny',text:'Czy firma wdrożyła procedury ochrony sygnalistów (obowiązek od 25.09.2024)?',s:{tak:0,nie:55,niewiem:35}},
+    {id:9,cat:'compliance',label:'● Compliance wewnętrzny',text:'Czy umowy o pracę zawierają wszystkie wymagane elementy (wynagrodzenie, wymiar czasu pracy, miejsce wykonywania)?',s:{tak:0,nie:50,niewiem:30}},
+    {id:10,cat:'rodo',label:'■ RODO',text:'Czy wszyscy pracownicy i współpracownicy otrzymali klauzule informacyjne RODO?',s:{tak:0,nie:55,niewiem:35}},
+    {id:11,cat:'rodo',label:'■ RODO',text:'Czy firma ma udokumentowane procedury przetwarzania danych osobowych pracowników?',s:{tak:0,nie:50,niewiem:30}},
+    {id:12,cat:'rodo',label:'■ RODO',text:'Czy dostęp do danych osobowych pracowników mają tylko upoważnione osoby?',s:{tak:0,nie:55,niewiem:35}},
+    {id:13,cat:'procedury',label:'▲ Procedury kontrolne',text:'Czy firma dokumentuje wszystkie rozwiązania umów (wypowiedzenia, porozumienia, świadectwa pracy)?',s:{tak:0,nie:50,niewiem:30}},
+    {id:14,cat:'procedury',label:'▲ Procedury kontrolne',text:'Czy firma ma przygotowane procedury na wypadek kontroli PIP, ZUS lub UODO?',s:{tak:0,nie:55,niewiem:35}},
+    {id:15,cat:'procedury',label:'▲ Procedury kontrolne',text:'Czy regulaminy i procedury HR są regularnie aktualizowane po zmianach w prawie?',s:{tak:0,nie:50,niewiem:30}}
+];
+
+let st = {cur:0,ans:{},ctx:{},user:{}};
+
+document.getElementById('start1').onclick = () => show('intro');
+
+const si = document.querySelectorAll('input[name="size"]');
+const bi = document.querySelectorAll('input[name="b2b"]');
+const s2 = document.getElementById('start2');
+
+function chk() {
+    const s = document.querySelector('input[name="size"]:checked');
+    const b = document.querySelector('input[name="b2b"]:checked');
+    s2.disabled = !(s && b);
+}
+
+si.forEach(i => i.onchange = chk);
+bi.forEach(i => i.onchange = chk);
+
+s2.onclick = () => {
+    st.ctx.size = document.querySelector('input[name="size"]:checked').value;
+    st.ctx.b2b = document.querySelector('input[name="b2b"]:checked').value;
+    show('questions');
+    renderQ();
+};
+
+function renderQ() {
+    const q = Q[st.cur];
+    const c = document.getElementById('q-content');
+
+    c.innerHTML = `
+        <div class="q-category ${q.cat==='b2b'?'b2b':''}">${q.label}</div>
+        <div class="q-text">${q.text}</div>
+        <div class="answers">
+            <button class="answer-btn" data-a="tak">TAK</button>
+            <button class="answer-btn" data-a="nie">NIE</button>
+            <button class="answer-btn" data-a="niewiem">NIE WIEM</button>
+        </div>
+    `;
+
+    c.querySelectorAll('.answer-btn').forEach(btn => {
+        if(st.ans[q.id] === btn.dataset.a) btn.classList.add('selected');
+        btn.onclick = () => {
+            st.ans[q.id] = btn.dataset.a;
+            c.querySelectorAll('.answer-btn').forEach(b => b.classList.remove('selected'));
+            btn.classList.add('selected');
+            document.getElementById('next').disabled = false;
+        };
+    });
+
+    upProg();
+    upNav();
+}
+
+function upProg() {
+    const p = ((st.cur+1)/Q.length)*100;
+    document.getElementById('prog').style.width = p+'%';
+    document.getElementById('prog-text').textContent = `${st.cur+1} / ${Q.length}`;
+}
+
+function upNav() {
+    document.getElementById('prev').disabled = st.cur === 0;
+    const a = st.ans[Q[st.cur].id];
+    document.getElementById('next').disabled = !a;
+    document.getElementById('next').textContent = st.cur === Q.length-1 ? 'ZAKOŃCZ →' : 'DALEJ →';
+}
+
+document.getElementById('prev').onclick = () => {
+    if(st.cur > 0) {
+        st.cur--;
+        renderQ();
+    }
+};
+
+document.getElementById('next').onclick = () => {
+    if(st.cur < Q.length-1) {
+        st.cur++;
+        renderQ();
+    } else {
+        show('lead');
+    }
+};
+
+document.getElementById('form').onsubmit = e => {
+    e.preventDefault();
+    st.user.email = document.getElementById('email').value;
+    st.user.name = document.getElementById('name').value;
+    st.user.company = document.getElementById('company').value;
+    st.user.position = document.getElementById('position').value;
+    st.user.phone = document.getElementById('phone').value;
+
+    calc();
+    document.getElementById('data').value = JSON.stringify(st);
+    show('results');
+    renderR();
+};
+
+function calc() {
+    const c = {dokumentacja:0,b2b:0,compliance:0,rodo:0,procedury:0};
+    const n = {dokumentacja:0,b2b:0,compliance:0,rodo:0,procedury:0};
+
+    Q.forEach(q => {
+        const a = st.ans[q.id];
+        c[q.cat] += q.s[a];
+        n[q.cat]++;
+    });
+
+    Object.keys(c).forEach(k => c[k] = Math.round(c[k]/n[k]));
+
+    const tot = Math.round((c.dokumentacja+c.b2b+c.compliance+c.rodo+c.procedury)/5);
+
+    let risk = '';
+    if(tot <= 20) risk = 'NISKIE RYZYKO';
+    else if(tot <= 40) risk = 'ŚREDNIE RYZYKO';
+    else if(tot <= 60) risk = 'WYSOKIE RYZYKO';
+    else risk = 'KRYTYCZNE RYZYKO';
+
+    const critAreas = Object.values(c).filter(v => v > 35).length;
+
+    // Najpierw zapisz tot, c, risk, critAreas do st.res
+    st.res = {tot, c, risk, critAreas, insights: []};
+
+    // Potem wygeneruj insights (które mogą używać st.res.tot)
+    st.res.insights = genInsights(c);
+}
+
+function genInsights(c) {
+    const ins = [];
+    const size = st.ctx.size;
+    const hasB2B = st.ctx.b2b === 'yes';
+
+    // B2B Critical - zawsze jeśli mają B2B
+    if(c.b2b > 35 && hasB2B) {
+        ins.push({
+            lv:'critical',
+            icon:'',
+            title:'Krytyczne ryzyko przekwalifikowania umów B2B',
+            text:`Analiza wykazała wynik ${c.b2b}/100, co wskazuje na wysokie prawdopodobieństwo przekwalifikowania umów cywilnoprawnych na umowy o pracę. Współpraca wykazuje cechy stosunku pracy, co naraża firmę na kary ZUS za składki wstecz (do 5 lat) wraz z odsetkami - średnio 50-200 tys. zł na osobę, kary PIP do 30 000 zł za każdą osobę oraz roszczenia pracownicze (urlopy, nadgodziny, wynagrodzenie chorobowe) średnio 20-40 tys. zł na osobę. ZUS przeprowadza kontrole bez zapowiedzi - w 2024 roku wykrywalność naruszeń wyniosła 78%.`,
+            actions:['Konsultacja prawna w zakresie przekwalifikowania umów B2B','Kompleksowa analiza umów pod kątem cech stosunku pracy (podporządkowanie, stałe godziny, miejsce wykonywania pracy)','Opracowanie planu naprawczego: przekształcenie krytycznych umów lub modyfikacja warunków współpracy','Wdrożenie zmian eliminujących przesłanki stosunku pracy','Dokumentacja samodzielności wykonawców na wypadek kontroli']
+        });
+    } else if(c.b2b > 20 && hasB2B) {
+        ins.push({
+            lv:'important',
+            icon:'▲',
+            title:`Ryzyko B2B: ${c.b2b}/100 - wymaga uwagi`,
+            text:`Niektóre aspekty współpracy B2B mogą budzić wątpliwości organów kontroli. Warto je zweryfikować zanim dojdzie do kontroli.`,
+            actions:['Przegląd umów B2B pod kątem cech stosunku pracy','Weryfikacja czy współpracownicy mają swobodę w wykonywaniu zadań','Dokumentacja samodzielności wykonawców B2B']
+        });
+    }
+
+    // Dokumentacja - zawsze pokazuj jeśli wynik > 15
+    if(c.dokumentacja > 30) {
+        ins.push({
+            lv:'important',
+            icon:'',
+            title:`Istotne braki w dokumentacji pracowniczej (${c.dokumentacja}/100)`,
+            text:`Zidentyfikowane braki w dokumentacji stanowią najczęstszy powód nałożenia kar przez Państwową Inspekcję Pracy (występują w 92% kontroli). Brak pisemnej informacji o warunkach zatrudnienia skutkuje karą w wysokości 1 000 - 30 000 zł za każdy przypadek. Przykładowo: firma zatrudniająca ${size === '250+' ? '250 osób' : size === '51-250' ? '100 osób' : size === '11-50' ? '30 osób' : '8 osób'} otrzymała łączną karę ${size === '250+' ? '420 000 zł' : size === '51-250' ? '180 000 zł' : size === '11-50' ? '65 000 zł' : '24 000 zł'} za braki dokumentacyjne. Kontrole przeprowadzane są bez zapowiedzi, często w następstwie skargi pracownika. W 2024 roku odnotowano wzrost liczby kontroli o 34%.`,
+            actions:['Przygotowanie pisemnych informacji o warunkach zatrudnienia dla wszystkich pracowników (wymóg prawny: 7 dni od rozpoczęcia pracy)','Opracowanie szczegółowych zakresów obowiązków dla wszystkich stanowisk','Audyt akt osobowych - uzupełnienie brakujących dokumentów','Weryfikacja zgodności umów o pracę z faktycznym wykonywaniem obowiązków','Opracowanie procedur postępowania na wypadek kontroli PIP']
+        });
+    } else if(c.dokumentacja > 15) {
+        ins.push({
+            lv:'normal',
+            icon:'■',
+            title:`Dokumentacja pracownicza: ${c.dokumentacja}/100`,
+            text:`Dokumentacja wymaga drobnych uzupełnień. Lepiej zrobić to teraz niż podczas kontroli.`,
+            actions:['Przegląd kompletności akt osobowych','Aktualizacja zakresów obowiązków','Weryfikacja zgodności dokumentów z rzeczywistością']
+        });
+    }
+
+    // RODO - kluczowe dla wszystkich
+    if(c.rodo > 30) {
+        ins.push({
+            lv:'important',
+            icon:'',
+            title:`Nieprawidłowości w przetwarzaniu danych osobowych (${c.rodo}/100)`,
+            text:`Zidentyfikowane naruszenia RODO w obszarze zatrudnienia mogą skutkować karami do 20 mln EUR lub 4% rocznego obrotu (w zależności, która wartość jest wyższa). W 2024 roku UODO nałożył znaczące kary: firma IT - 280 000 zł (brak klauzul informacyjnych), firma handlowa - 195 000 zł (nieprawidłowy dostęp do danych), korporacja - 450 000 zł (braki w zabezpieczeniach). Każdy pracownik może złożyć skargę do UODO. Średni czas od skargi do kontroli wynosi 30 dni. Oszacowane ryzyko kary dla Państwa firmy: ${size === '250+' ? '300-500 tys. zł' : size === '51-250' ? '150-300 tys. zł' : size === '11-50' ? '50-150 tys. zł' : '30-80 tys. zł'}.`,
+            actions:['Wdrożenie klauzul informacyjnych RODO dla pracowników i kandydatów do pracy','Ograniczenie dostępu do danych osobowych wyłącznie do upoważnionych osób','Przygotowanie dokumentacji przetwarzania danych (rejestry czynności, podstawy prawne)','Opracowanie procedur realizacji praw osób (dostęp, sprostowanie, usunięcie danych)','Wdrożenie zabezpieczeń technicznych i organizacyjnych (hasła, szyfrowanie, kontrola dostępu)','Przygotowanie planu reakcji na naruszenie ochrony danych (obowiązek zgłoszenia w ciągu 72h)']
+        });
+    } else if(c.rodo > 15) {
+        ins.push({
+            lv:'normal',
+            icon:'■',
+            title:`RODO: ${c.rodo}/100`,
+            text:`Podstawowe procedury RODO są wdrożone, ale warto je uzupełnić o dodatkowe zabezpieczenia.`,
+            actions:['Aktualizacja klauzul RODO','Przegląd uprawnień dostępu do danych','Szkolenie pracowników HR z RODO']
+        });
+    }
+
+    // Compliance - szczególnie ważne dla większych firm
+    if(c.compliance > 30) {
+        const sygnalisciNote = size === '250+' || size === '51-250' ? ' Od 25 września 2024 roku firmy zatrudniające powyżej 50 osób muszą wdrożyć procedury ochrony sygnalistów - brak procedur to kara do 100 000 zł.' : '';
+        ins.push({
+            lv:'important',
+            icon:'●',
+            title:`Compliance wewnętrzny: ${c.compliance}/100`,
+            text:`Brak aktualnych regulaminów i procedur naraża firmę na spory pracownicze, kary administracyjne oraz roszczenia odszkodowawcze.${sygnalisciNote}`,
+            actions:['Aktualizacja lub przygotowanie regulaminu pracy (obowiązkowy dla firm 50+ osób)','Aktualizacja regulaminu wynagradzania z uwzględnieniem wszystkich składników wynagrodzenia',size === '250+' || size === '51-250' ? 'PILNE: Wdrożenie procedur ochrony sygnalistów (deadline: 25.09.2024)' : 'Wdrożenie procedur ochrony sygnalistów','Weryfikacja zgodności umów o pracę z wymogami kodeksu pracy','Przegląd i aktualizacja pozostałych regulaminów (np. ZFŚS, pracy zdalnej)']
+        });
+    } else if(c.compliance > 15) {
+        ins.push({
+            lv:'normal',
+            icon:'●',
+            title:`Compliance wewnętrzny: ${c.compliance}/100`,
+            text:`Podstawowe regulaminy są wdrożone, ale wymagają aktualizacji w związku ze zmianami prawnymi.`,
+            actions:['Przegląd regulaminów pod kątem zmian prawnych','Aktualizacja procedur wewnętrznych','Szkolenie menedżerów z procedur HR']
+        });
+    }
+
+    // Procedury - przygotowanie na kontrole
+    if(c.procedury > 30) {
+        ins.push({
+            lv:'important',
+            icon:'▲',
+            title:`Procedury kontrolne: ${c.procedury}/100`,
+            text:`Firma jest nieprzygotowana na kontrole organów nadzoru (PIP, ZUS, UODO). Brak procedur zwiększa ryzyko kar i nakazów naprawczych. Kontrole PIP mogą być przeprowadzane bez zapowiedzi, a inspektorzy mają prawo wglądu do wszelkiej dokumentacji pracowniczej.`,
+            actions:['Przygotowanie procedur reagowania na kontrole PIP, ZUS i UODO (krok po kroku)','Wyznaczenie osób odpowiedzialnych za kontakt z organami kontroli','Przygotowanie kompletu dokumentów wymaganych podczas kontroli','Wdrożenie procedur prawidłowego rozwiązywania umów i wydawania świadectw pracy','Regularna aktualizacja przepisów wewnętrznych po zmianach w prawie pracy','Przeprowadzenie wewnętrznego audytu przed ewentualną kontrolą zewnętrzną']
+        });
+    } else if(c.procedury > 15) {
+        ins.push({
+            lv:'normal',
+            icon:'▲',
+            title:`Procedury kontrolne: ${c.procedury}/100`,
+            text:`Podstawowe procedury istnieją, ale warto je uszczegółowić i zaktualizować.`,
+            actions:['Aktualizacja procedur kontrolnych','Przegląd dokumentacji rozwiązań umów','Szkolenie zespołu HR z aktualnych przepisów']
+        });
+    }
+
+    // Dodatkowy insight o wielkości firmy
+    if(size === '250+') {
+        ins.push({
+            lv:'normal',
+            icon:'●',
+            title:'Uwaga: Duża firma - dodatkowe wymogi',
+            text:'Jako firma zatrudniająca powyżej 250 osób podlegacie dodatkowym obowiązkom: obowiązkowy regulamin pracy, procedury sygnalistów, szczególne wymogi BHP, potencjalnie wyższe kary za naruszenia.',
+            actions:['Weryfikacja spełnienia wszystkich dodatkowych wymogów dla dużych firm','Przegląd procedur pod kątem compliance dla firm 250+','Konsultacja z prawnikiem specjalizującym się w dużych organizacjach']
+        });
+    }
+
+    // Pozytywny insight jeśli ogólny wynik jest dobry
+    if(st.res.tot < 20) {
+        ins.push({
+            lv:'positive',
+            icon:'●',
+            title:'Gratulacje - niskie ryzyko prawne',
+            text:'Wasza organizacja ma dobrze przygotowane procedury HR. Wykryte drobne uchybienia można łatwo naprawić poprzez proste działania naprawcze.',
+            actions:['Regularne przeglądy dokumentacji (co 6-12 miesięcy)','Monitorowanie zmian w prawie pracy','Szkolenia dla zespołu HR z nowości prawnych']
+        });
+    }
+
+    return ins;
+}
+
+function renderR() {
+    const {tot, c, risk, critAreas, insights} = st.res;
+
+    document.getElementById('co-name').textContent = `FIRMA: ${(st.user.company||'TWOJA FIRMA').toUpperCase()}`;
+    document.getElementById('total-score').textContent = tot;
+    document.getElementById('risk-label').textContent = risk;
+    document.getElementById('critical-areas').textContent = critAreas;
+
+    // Risk Alert Box
+    const riskAlert = document.getElementById('risk-alert');
+    let alertHTML = '';
+
+    if(tot > 60) {
+        alertHTML = `
+            <div class="risk-alert-title">Krytyczny poziom ryzyka prawnego</div>
+            <div class="risk-alert-text">
+                Analiza wykazała <strong>bardzo wysokie ryzyko kar finansowych oraz kontroli organów nadzoru</strong>.
+                Zidentyfikowano ${critAreas} ${critAreas === 1 ? 'obszar krytyczny wymagający' : 'obszary krytyczne wymagające'} natychmiastowej interwencji prawnej.
+                <strong>Potencjalne sankcje mogą sięgać setek tysięcy złotych</strong>. Kontrole PIP, ZUS oraz UODO mogą zostać przeprowadzone bez uprzedniego powiadomienia.
+            </div>
+        `;
+    } else if(tot > 40) {
+        alertHTML = `
+            <div class="risk-alert-title">Wysokie ryzyko prawne</div>
+            <div class="risk-alert-text">
+                Zidentyfikowano <strong>istotne nieprawidłowości</strong> w ${critAreas} ${critAreas === 1 ? 'obszarze wymagającym' : 'obszarach wymagających'}
+                pilnej naprawy. Każdy dzień zwłoki zwiększa ekspozycję na kontrole i sankcje.
+                <strong>Kary za wykryte uchybienia mogą wynosić dziesiątki tysięcy złotych</strong>, poza ryzykiem roszczeń pracowniczych.
+            </div>
+        `;
+    } else if(tot > 20) {
+        alertHTML = `
+            <div class="risk-alert-title">Średnie ryzyko prawne</div>
+            <div class="risk-alert-text">
+                Analiza wykazała <strong>luki w dokumentacji oraz procedurach compliance</strong>.
+                Choć nie stanowią one jeszcze krytycznego zagrożenia, mogą prowadzić do sankcji finansowych podczas kontroli.
+                Rekomendujemy podjęcie działań naprawczych przed eskalacją problemów.
+            </div>
+        `;
+    } else {
+        alertHTML = `
+            <div class="risk-alert-title" style="color: #27ae60;">Niskie ryzyko prawne</div>
+            <div class="risk-alert-text" style="color: #27ae60;">
+                Organizacja wykazuje <strong>dobrą zgodność z wymogami prawnymi</strong>. Zidentyfikowane uchybienia mają charakter drobny
+                i mogą zostać łatwo wyeliminowane. Pełny audyt HR pomoże osiągnąć 100% zgodności z przepisami prawa pracy.
+            </div>
+        `;
+    }
+
+    riskAlert.innerHTML = alertHTML;
+
+    // Chart
+    const ctx = document.getElementById('chart').getContext('2d');
+    new Chart(ctx, {
+        type: 'radar',
+        data: {
+            labels: ['Dokumentacja','Ryzyko B2B','Compliance','RODO','Procedury'],
+            datasets: [{
+                label: 'Poziom ryzyka',
+                data: [c.dokumentacja, c.b2b, c.compliance, c.rodo, c.procedury],
+                backgroundColor: 'rgba(228,65,0,0.15)',
+                borderColor: '#e44100',
+                borderWidth: 2,
+                pointBackgroundColor: '#e44100',
+                pointBorderColor: '#1d1d1b',
+                pointBorderWidth: 2,
+                pointRadius: 5
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            scales: {
+                r: {
+                    min: 0,
+                    max: 100,
+                    beginAtZero: true,
+                    ticks: {
+                        stepSize: 20,
+                        font: {family:'Montserrat',size:11,weight:'700'},
+                        backdropColor: 'transparent'
+                    },
+                    pointLabels: {
+                        font: {family:'Montserrat',size:12,weight:'900'}
+                    },
+                    grid: {
+                        color: '#e0e0e0',
+                        lineWidth: 1
+                    },
+                    angleLines: {
+                        color: '#e0e0e0',
+                        lineWidth: 1
+                    }
+                }
+            },
+            plugins: {
+                legend: {
+                    display: false
+                }
+            },
+            font: {
+                family: 'Futura, "Trebuchet MS", Arial, sans-serif'
+            }
+        }
+    });
+
+    // Insights
+    const ic = document.getElementById('insights');
+    ic.innerHTML = '';
+    insights.forEach(ins => {
+        const d = document.createElement('div');
+        d.className = `insight-card ${ins.lv}`;
+        d.innerHTML = `
+            <div class="insight-header">
+                <span class="insight-icon">${ins.icon}</span>
+                <span class="insight-title">${ins.title}</span>
+            </div>
+            <div class="insight-text">${ins.text}</div>
+            <ul class="insight-list">
+                ${ins.actions.map(a => `<li>${a}</li>`).join('')}
+            </ul>
+        `;
+        ic.appendChild(d);
+    });
+}
+
+document.getElementById('contact-form').onsubmit = e => {
+    e.preventDefault();
+    alert('Dziękujemy za zapytanie! Skontaktujemy się w ciągu 24h.');
+};
+
+function show(id) {
+    document.querySelectorAll('.quiz-section').forEach(s => s.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    window.scrollTo(0,0);
+}
+</script>
+
 </body>
 </html>
